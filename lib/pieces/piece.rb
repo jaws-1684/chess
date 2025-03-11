@@ -6,10 +6,14 @@ class Piece
     @symbol = assign_symbol
   end
 
+  def move(spos, tpos, board)
+    raise NotImplementedError, "Subclasses must implement the move method"
+  end
+
   private
 
   def assign_symbol
-    # To be overridden by subclasses
-    "?"
+    raise NotImplementedError, "Subclasses must implement the assign_symbol method"
   end
+  
 end
