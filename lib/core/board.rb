@@ -6,6 +6,14 @@ class Board
     populate_board
   end
 
+  def select(pos)
+    x, y = pos
+    raise "Invalid position: #{pos}" unless x.between?(0, 7) && y.between?(0, 7)
+    piece = @grid[x][y]
+    raise "No piece at #{pos}!" if piece.nil?
+    piece
+  end
+
   private
 
   def populate_board
