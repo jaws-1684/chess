@@ -1,17 +1,43 @@
 class Board
-  attr_reader :grid
+  attr_accessor :grid, :captured_pieces
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
+    @captured_pieces = []
     populate_board
   end
 
-  def select(pos)
+  def valid_position?(pos)
+    pos[0].between?(0,7) && pos[1].between?(0,7)
+  end
+
+  def select_piece(pos)
+    raise "Invalid position: #{pos}" unless pos.is_a?(Array) && pos.size == 2
     x, y = pos
-    raise "Invalid position: #{pos}" unless x.between?(0, 7) && y.between?(0, 7)
-    piece = @grid[x][y]
-    raise "No piece at #{pos}!" if piece.nil?
-    piece
+    raise "Invalid position: #{pos}" unless valid_position?(pos)
+    grid[x][y]
+  end
+
+  def update_piece(pos, piece)
+    row, col = pos
+    return unless valid_position?(pos) 
+    
+    @grid[row][col] = piece
+  end
+
+  def update_board(move)
+    piece = select_piece(move.start_pos)
+    @grid[move.end_pos[0]][move.end_pos[1]] = piece
+    @grid[move.start_pos[0]][move.start_pos[1]] = nil
+  end
+
+  def find_king(color)
+    grid.each_with_index do |row, x|
+      row.each_with_index do |piece, y|
+        return [x, y] if piece.is_a?(King) && piece.color == color
+      end
+    end
+    nil
   end
 
   private

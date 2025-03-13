@@ -4,7 +4,6 @@ class Display
   end
 
   def render
-    system("clear") || system("cls")
     puts "\n"
     print_headers
     print_board
