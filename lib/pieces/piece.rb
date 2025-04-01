@@ -9,11 +9,6 @@ class Piece
     @symbol = assign_symbol
   end
 
-  def valid_capture_target?(move)
-    target_piece = move.board.select_piece(move.end_pos)
-    target_piece&.color != color && !target_piece.nil?
-  end
-
   include ChessCore
 
   def move
@@ -24,14 +19,9 @@ class Piece
      raise NotImplementedError, "Subclasses must implement the valid_move? method"
   end
 
-
-  private
-
   def assign_symbol
     raise NotImplementedError, "Subclasses must implement the assign_symbol method"
   end
-
- 
 
   def handle_capture(move)
     captured_piece = move.board.select_piece(move.end_pos)
@@ -42,4 +32,8 @@ class Piece
     move.board.select_piece(move.end_pos).nil?
   end
 
+  def valid_capture_target?(move)
+    target_piece = move.board.select_piece(move.end_pos)
+    target_piece&.color != color && !target_piece.nil?
+  end
 end

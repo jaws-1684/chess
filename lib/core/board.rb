@@ -18,7 +18,7 @@ class Board
     grid[x][y]
   end
 
-  def update_piece(pos, piece)
+  def update_pos_after_enpassant(pos, piece)
     row, col = pos
     return unless valid_position?(pos) 
     
@@ -31,21 +31,27 @@ class Board
     @grid[move.start_pos[0]][move.start_pos[1]] = nil
   end
 
-  def find_king(color)
-    grid.each_with_index do |row, x|
-      row.each_with_index do |piece, y|
-        return [x, y] if piece.is_a?(King) && piece.color == color
-      end
-    end
-    nil
+  def marshal_dump
+    {
+      grid: @grid,
+      captured_pieces: @captured_pieces
+      # Include any other important board state
+    }
+  end
+
+  def marshal_load(data)
+    @grid = data[:grid]
+    @captured_pieces = data[:captured_pieces]
+    # Restore any other important board state
   end
 
   private
 
   def populate_board
+
     @grid[0] = [
       Rook.new(:white), Knight.new(:white), Bishop.new(:white), Queen.new(:white),
-      King.new(:white), Bishop.new(:white), Knight.new(:white), Rook.new(:white)
+      King.new(:white), nil, nil, Rook.new(:white)
     ]
     @grid[1] = Array.new(8) { Pawn.new(:white) }
 
@@ -54,6 +60,18 @@ class Board
       King.new(:black), Bishop.new(:black), Knight.new(:black), Rook.new(:black)
     ]
     @grid[6] = Array.new(8) { Pawn.new(:black) }
+
+    # @grid[0] = [
+    #   Rook.new(:white), Knight.new(:white), Bishop.new(:white), Queen.new(:white),
+    #   King.new(:white), Bishop.new(:white), Knight.new(:white), Rook.new(:white)
+    # ]
+    # @grid[1] = Array.new(8) { Pawn.new(:white) }
+
+    # @grid[7] = [
+    #   Rook.new(:black), Knight.new(:black), Bishop.new(:black), Queen.new(:black),
+    #   King.new(:black), Bishop.new(:black), Knight.new(:black), Rook.new(:black)
+    # ]
+    # @grid[6] = Array.new(8) { Pawn.new(:black) }
 
   end
 end

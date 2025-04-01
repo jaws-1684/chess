@@ -9,11 +9,11 @@ class Pawn < Piece
   end
 
    def valid_move?(move)
-    return false unless valid_step_pattern?(move)
-    return false unless clear_destination?(move)
-    return false unless vertical_path_clear?(move)
-
-    true
+  return true if valid_step_pattern?(move) && clear_destination?(move) && vertical_path_clear?(move)
+  return true if valid_diagonal_capture?(move)
+  return true if valid_enpassant?(move)
+  
+  false
   end
 
   include Stepping
@@ -113,6 +113,6 @@ class Pawn < Piece
     captured_pawn = move.board.select_piece(capture_pos)
     
     move.board.captured_pieces << captured_pawn
-    move.board.update_piece(capture_pos, nil)
+    move.board.update_pos_after_enpassant(capture_pos, nil)
   end
 end

@@ -12,6 +12,12 @@ module ChessCore
       end_pos[0] - start_pos[0]
     end
 
+    def cloned_board
+      new_board = Marshal.load(Marshal.dump(board))
+
+      return new_board
+    end
+
     def dy
       end_pos[1] - start_pos[1]
     end

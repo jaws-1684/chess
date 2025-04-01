@@ -1,16 +1,23 @@
+require_relative '../core/doome'
+require_relative '../core/beacon'
+
 class King < Piece
   attr_reader :name
-  attr_accessor :king_in_check
+  attr_accessor :has_moved 
 
   def initialize(color)
     super(color)
     @name = 'king'
+    @has_moved = false
   end
 
   include Slide
+  include Doomed
+  include FindKing
 
   def move(move)
     execute_move(move)
+    @has_moved = true
   end
 
   def valid_move?(move)
@@ -20,113 +27,13 @@ class King < Piece
     true
   end
 
-  def self.in_check?(board, color)
-    king_pos = board.find_king(color)
-    return false unless king_pos
-
-    opponent_color = color == :white ? :black : :white
-
-    board.grid.each_with_index do |row, x|
-      row.each_with_index do |piece, y|
-        next if piece.nil? || piece.color != opponent_color
-
-        # Create a move from opponent's piece to king's position
-        move = ChessCore::Move.new([x, y], king_pos, board)
-        
-        # Check if this is a valid capture move
-        if piece.valid_capture_target?(move) && piece.valid_move?(move)
-          return true
-        end
-      end
-    end
-    
-    false
+  def check_state(board, current_player_color, king_pos)
+    return true if in_check?(board, current_player_color, king_pos)
   end
 
-#   def self.checkmate?(color)
-#     return false unless in_check?(color)
-
-#     king = board.find_king(color)
-#     attackers = find_attackers(king, color)
-
-#   # If multiple attackers, king must move (no blocking/capturing possible)
-#     return false if king_can_escape?(king, color)
-
-#   # For single attacker
-#     if attackers.size == 1
-#       attacker = attackers.first
-#       return false if can_capture_attacker?(attacker, color) || 
-#                     can_block_attack?(attacker, king, color)
-#     end
-
-#     true
-#   end
-
-#   def find_attackers(king, color)
-#   opponent_color = (color == :white) ? :black : :white
-#   board.grid.pieces.flatten.select do |piece|
-#     piece.color == opponent_color && piece.attacks?(king.position, board)
-#   end
-#   end
-
-#   def king_can_escape?(king, color)
-#   king.possible_moves.any? do |move|
-#     !square_under_attack?(move, color)
-#   end
-# end
-
-#   def square_under_attack?(pos, defender_color)
-#   attacker_color = (defender_color == :white) ? :black : :white
-#   board.pieces.any? do |piece|
-#     piece.color == attacker_color && piece.attacks?(pos, board)
-#   end
-#   end
-
-#   def can_capture_attacker?(attacker, defender_color)
-#   defender_pieces = board.pieces.select { |p| p.color == defender_color }
-#   defender_pieces.any? do |piece|
-#     piece != find_king(defender_color) && 
-#     piece.valid_moves.include?(attacker.position)
-#   end
-#   end
-
-#   def can_block_attack?(attacker, king, color)
-#   return false unless attacker.is_a?(SteppingPiece) # Only for sliding pieces (Bishop/Rook/Queen)
-
-#   path = get_attack_path(attacker.position, king.position)
-#   path.any? do |block_square|
-#     board.pieces.any? do |piece|
-#       piece.color == color && 
-#       piece != king && 
-#       piece.valid_moves.include?(block_square)
-#     end
-#   end
-#   end
-
-# def get_attack_path(from, to)
-#   # Generate squares between attacker and king (exclusive)
-#   # Example: For rook moving vertically
-#   if from[0] == to[0] # Same row
-#     min, max = [from[1], to[1]].sort
-#     (min + 1...max).map { |y| [from[0], y] }
-#   elsif from[1] == to[1] # Same column
-#     min, max = [from[0], to[0]].sort
-#     (min + 1...max).map { |x| [x, from[1]] }
-#   else # Diagonal
-#     x_step = (to[0] - from[0]) > 0 ? 1 : -1
-#     y_step = (to[1] - from[1]) > 0 ? 1 : -1
-#     path = []
-#     current = from.dup
-#     while current != to
-#       current = [current[0] + x_step, current[1] + y_step]
-#       break if current == to
-#       path << current
-#     end
-#     path
-#   end
-#   end
-
-
+  def check_mate_state(board, current_player_color, king_pos)
+    return true if in_check_mate?(board, current_player_color, king_pos)
+  end
   private
   
   def assign_symbol
@@ -143,6 +50,8 @@ class King < Piece
   end
 
   def execute_move(move)
+    return false unless prevent_self_check(move, self.color)
+
     if valid_move?(move) && clear_destination?(move)
       move.board.update_board(move)
       return true
@@ -150,11 +59,74 @@ class King < Piece
       handle_capture(move)
       move.board.update_board(move)
       return true
+    elsif castle(move)
+      return true  
     end
     false
   end
 
+   def prevent_self_check(move, current_player_color)
+    temp_board = move.cloned_board
+    temp_board.update_board(move)
+
+    if check_state(temp_board, current_player_color, move.end_pos)
+      false
+    else
+      true
+    end  
+  end
+
+def castle(move)
+  king = move.board.select_piece(move.start_pos)
+  return false unless king.is_a?(King) && !king.has_moved
+
+  row = king.color == :white ? 0 : 7
+  
+  if move.end_pos == [row, 6] # Kingside castling
+    rook_pos = [row, 7]
+    rook = move.board.select_piece(rook_pos)
+    return false unless rook.is_a?(Rook) && !rook.has_moved
+    return false unless move.board.grid[row][5].nil? && move.board.grid[row][6].nil?
+    return false if in_check?(move.board, king.color, [row, 4]) || 
+                   in_check?(move.board, king.color, [row, 5]) || 
+                   in_check?(move.board, king.color, [row, 6])
+
+    # Update king and rook positions
+    move.board.grid[row][4] = nil
+    move.board.grid[row][6] = king
+    move.board.grid[row][5] = rook
+    move.board.grid[row][7] = nil
+    
+    # Update movement status
+    king.has_moved = true
+    rook.has_moved = true
+    return true
+  end
+
+  if move.end_pos == [row, 2] # Queenside castling
+    rook_pos = [row, 0]
+    rook = move.board.select_piece(rook_pos)
+    return false unless rook.is_a?(Rook) && !rook.has_moved
+    return false unless move.board.grid[row][1].nil? && 
+                        move.board.grid[row][2].nil? && 
+                        move.board.grid[row][3].nil?
+    return false if in_check?(move.board, king.color, [row, 4]) || 
+                   in_check?(move.board, king.color, [row, 3]) || 
+                   in_check?(move.board, king.color, [row, 2])
+
+    # Update king and rook positions
+    move.board.grid[row][4] = nil
+    move.board.grid[row][2] = king
+    move.board.grid[row][3] = rook
+    move.board.grid[row][0] = nil
+    
+    # Update movement status
+    king.has_moved = true
+    rook.has_moved = true
+    return true
+  end
+
+  false
+end
 end
 
-
- 
