@@ -20,7 +20,7 @@ Add your code in the `lib` folder and your tests in the `spec` folder.
 
 ## Author
 
-Dan
+jaws
 
 ## License
 
