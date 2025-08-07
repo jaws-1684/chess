@@ -303,6 +303,7 @@ end
   
   def clear_screen
     system("clear") || system("cls")
+    puts "\e[H\e[2J"
   end
 
   def welcome_screen
@@ -356,5 +357,19 @@ end
 
 
     
+require 'colorize' or https://github.com/ku1ik/rainbow(might be better)
 
-  
+size = 8
+
+size.times do |i|
+  size.times do |j|
+    if (i + j).even?
+      print " ♖ ♜ ".colorize(background: :black)
+    else
+      print " ♖ ♜ ".colorize(background: :white)
+    end
+  end
+  puts
+end
+
+x = :♜ 
