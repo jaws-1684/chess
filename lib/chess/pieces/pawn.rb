@@ -26,8 +26,7 @@ module Chess
       super
       basic_action do
         puts "Attacking #{destination_position}."
-        if enemy.enpassant_vulnerable
-          binding.pry
+        if !!enemy&.enpassant_vulnerable
           board.clear_cell([dx-direction, dy])
         end
         @first_move = false 
@@ -45,9 +44,10 @@ module Chess
         color == :white ? "♙" : "♟"
       end
       def clone_pawn!
-        cloned_pawn = Pawn.new(:red, [dx-direction, dy])
+        cloned_pawn = Pawn.new(self.color, [dx-direction, dy])
         cloned_pawn.enpassant_vulnerable = true
         cloned_pawn.symbol = self.symbol.colorize(:red)
+        board.clone_pawn = cloned_pawn
         board.add_to_cell([dx-direction, dy], cloned_pawn)
       end
   end
