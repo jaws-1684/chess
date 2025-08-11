@@ -1,5 +1,6 @@
 module Chess
   class Pawn < Piece
+    include Validator::Pawn
     attr_reader :name, :first_move, :direction
     attr_accessor :enpassant_vulnerable
 
@@ -13,10 +14,9 @@ module Chess
 
     def move!
       super
-      basic_action do
-        puts "Moving to #{destination_position}."
+      basic_move do
         if enpassant_vulnerable?        
-          clone_pawn!
+          generate_temporary_pawn!
         end
         @first_move = false 
       end
@@ -24,31 +24,31 @@ module Chess
 
     def attack!
       super
-      basic_action do
-        puts "Attacking #{destination_position}."
+      basic_attack do
+        enpassant_vulnerable?
         if !!enemy&.enpassant_vulnerable
           board.clear_cell([dx-direction, dy])
         end
         @first_move = false 
-      end    
-    end
-
-    def enpassant_vulnerable?
-      (destination_position == double_step) ? @enpassant_vulnerable = true : @enpassant_vulnerable = false
-      @enpassant_vulnerable
+      end
+      binding.pry    
     end
  
     private
-      include Validator::Pawn
+      
       def assign_symbol
         color == :white ? "♙" : "♟"
       end
-      def clone_pawn!
-        cloned_pawn = Pawn.new(self.color, [dx-direction, dy])
-        cloned_pawn.enpassant_vulnerable = true
-        cloned_pawn.symbol = self.symbol.colorize(:red)
-        board.clone_pawn = cloned_pawn
-        board.add_to_cell([dx-direction, dy], cloned_pawn)
+      def generate_temporary_pawn!
+        temporary_pawn = Pawn.new(self.color, [dx-direction, dy])
+        temporary_pawn.enpassant_vulnerable = true
+        temporary_pawn.symbol = self.symbol.colorize(:red)
+        board.temporary_pawn = temporary_pawn
+        board.add_to_cell([dx-direction, dy], temporary_pawn)
+      end
+       def enpassant_vulnerable?
+        (destination_position == double_step) ? @enpassant_vulnerable = true : @enpassant_vulnerable = false
+        @enpassant_vulnerable
       end
   end
 end
