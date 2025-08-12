@@ -1,4 +1,36 @@
 #!/usr/bin/env ruby
+require_relative "../lib/chess/validator"
+require_relative "../lib/chess/piece"
+require_relative "../lib/chess/board"
+require_relative "../lib/chess/display"
+require "pry-byebug"
+require "colorize"
+
 module Chess
-	
+	class Game
+	attr_reader :board, :display, :current_player
+  
+  def initialize board=Board.new, display=Display
+    @board = board
+    @display = display.new(board)
+    @current_player = :white
+  end
+
+  def play
+  	loop do
+        puts "Captured pieces: #{board.captured_pieces.map(&:name)}"
+    		display.render
+    		print "Select a piece: "
+    		inp = gets.chomp.split("").map(&:to_i)
+    		print "Select a position to move: "
+    		inp2= gets.chomp.split("").map(&:to_i)
+    		piece = board.select_piece(inp, :white)
+    		piece.board = board
+    		piece.destination_position = inp2
+    		piece.move!
+ 		end
+  end
+  end
 end
+
+Chess::Game.new.play

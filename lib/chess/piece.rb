@@ -15,8 +15,10 @@ module Chess
       @destination_position[1]
     end
   end
+  
   class Piece
     include Coordinates
+    include Validator::Path
     attr_reader :color, :current_position, :last_position
     attr_accessor :destination_position, :board, :symbol
 
@@ -29,31 +31,36 @@ module Chess
     def friendly? other_piece
       other_piece.color == self.color
     end
+    def enemy? other_piece
+      other_piece.color != self.color
+    end
     def enemy
-      board.grid[dx][dy]
+      piece = board[dx, dy]
+      raise "You cannot attack your own #{piece.name}!" if piece&.friendly?(self)
+      piece
     end
     def assign_symbol
       raise NotImplementedError, "Subclasses must implement the assign_symbol method"
     end
-    def valid_move?
-      raise "Destination position is missing!" unless destination_position
-    end
     def move!
+      raise "Destination position is missing!" unless destination_position
       raise "Not a valid #{self.name} move!" unless valid_move?
-    end
-    def attack!
-      raise "Not a valid #{self.name} attack!" unless valid_attack?
+      raise "Path is not clear!" unless path_clear?
     end
     private
-      def basic_action
+      def basic_move &block
+        puts "Moving to #{destination_position}."
         yield if block_given? 
+
         @last_position = @current_position
         @current_position = destination_position
-        board.update_board(last_position, current_position)
+        board.captured_pieces << enemy if !!enemy
+        board.update!(self, last_position, current_position)
         @destination_position = nil    
       end
   end
 end
+require "ostruct"
 require_relative "pieces/bishop"
 require_relative "pieces/king"
 require_relative "pieces/knight"
