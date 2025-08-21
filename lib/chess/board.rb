@@ -1,8 +1,12 @@
+require_relative "./gamestate/gamestate"
+
 module Chess
   class Board
-    attr_accessor :grid, :captured_pieces, :temporary_pawn
-    attr_reader :moves, :last_move
-
+    include Gamestate::Check
+    include Gamestate::Checkmate
+    attr_accessor :grid, :captured_pieces, :temporary_pawn, :current_player_color
+    alias_method :color, :current_player_color
+    
     def initialize
       @grid = Array.new(8) { Array.new(8) }
       @captured_pieces = []
@@ -18,12 +22,12 @@ module Chess
       @moves << destination_position
 
       #removing the cloned pawn created after a double step from the board if not attacked
-      if !!temporary_pawn&.enemy?(piece) && (destination_position != temporary_pawn.current_position)
+      if !!temporary_pawn&.enemy?(piece)
         clear_cell(temporary_pawn.current_position)
         @temporary_pawn = nil
       end
     end
-    def select_piece  position, color
+    def select_piece position
       with_unpack(position) do |x, y|
         raise "Invalid position: #{position}" unless valid_position?(position)
         raise "Invalid selection: #{position}. You cannot select an empty square!" if clear_destination?(position)
@@ -31,6 +35,19 @@ module Chess
         raise "You can select only #{color} pieces!" unless piece.color == color 
         piece
       end
+    end
+
+    def pieces
+      grid.flatten.compact
+    end
+    def enemies
+      pieces.reject { |piece| piece.color == color }
+    end
+    def players_pieces
+      pieces.select {|piece| piece.color == color }
+    end
+    def king
+      pieces.select(&current_king).first
     end
     def is_a_piece? position, kind=Piece
       with_unpack(position) { |x, y|  @grid[x][y].is_a? kind }
@@ -59,6 +76,9 @@ module Chess
     def [] x, y
       @grid[x][y]
     end
+    def dup
+      Marshal.load(Marshal.dump(self))
+    end
 
     private
 
@@ -66,34 +86,36 @@ module Chess
       @grid = Array.new(8) { Array.new(8) }
 
       @grid[0] = [
-        Rook.new(:white, [0, 0]),
-        Knight.new(:white, [0, 1]),
-        Bishop.new(:white, [0, 2]),
-        Queen.new(:white,  [0, 3]),
-        King.new(:white,   [0, 4]),
-        nil, nil,
-        # Bishop.new(:white, [0, 5]),
-        # Knight.new(:white, [0, 6]),
-        Rook.new(:white,   [0, 7])
+        Rook.new(:white, [0, 0], self),
+        Knight.new(:white, [0, 1], self),
+        Bishop.new(:white, [0, 2], self),
+        Queen.new(:white,  [0, 3], self),
+        King.new(:white,   [0, 4], self),
+        Bishop.new(:white, [0, 5], self),
+        Knight.new(:white, [0, 6], self),
+        Rook.new(:white,   [0, 7], self)
       ]
-      @grid[3] = Array.new(8) { |i| Pawn.new(:white, [3, i]) }
-
+      @grid[1] = Array.new(8) { |i| Pawn.new(:white, [1, i], self) }
+      # @grid[1] = Array.new(8) { |i| nil }
       @grid[7] = [
-        Rook.new(:black,   [7, 0]),
-        Knight.new(:black, [7, 1]),
-        Bishop.new(:black, [7, 2]),
-        Queen.new(:black,  [7, 3]),
-        King.new(:black,   [7, 4]),
-        Bishop.new(:black, [7, 5]),
-        Knight.new(:black, [7, 6]),
-        Rook.new(:black,   [7, 7])
+        Rook.new(:black,   [7, 0], self),
+        Knight.new(:black, [7, 1], self),
+        Bishop.new(:black, [7, 2], self),
+        Queen.new(:black,  [7, 3], self),
+        King.new(:black,   [7, 4], self),
+        Bishop.new(:black, [7, 5], self),
+        Knight.new(:black, [7, 6], self),
+        Rook.new(:black,   [7, 7], self)
       ]
-      @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i]) }
-
+      @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
+      # @grid[6] = Array.new(8) { |i| nil }
     end
     def with_unpack position
       px, py = position
       yield(px, py) if block_given?
+    end
+    def current_king
+      proc {|piece| piece.is_a?(King) && piece.color == color }
     end
   end
 end

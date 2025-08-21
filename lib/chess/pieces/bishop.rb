@@ -1,10 +1,10 @@
 module Chess
   class Bishop < Piece
-    include Validator::Slidable::Diagonal
+    include Validatable::Slidable::Diagonal
     attr_reader :name
 
-    def initialize color, current_position
-      super(color, current_position)
+    def initialize color, current_position, board
+      super(color, current_position, board)
       @name = :bishop
     end
 

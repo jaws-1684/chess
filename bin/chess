@@ -1,36 +1,48 @@
 #!/usr/bin/env ruby
-require_relative "../lib/chess/validator"
 require_relative "../lib/chess/piece"
 require_relative "../lib/chess/board"
-require_relative "../lib/chess/display"
+require_relative "../lib/chess/displayable"
 require "pry-byebug"
 require "colorize"
 
 module Chess
 	class Game
-	attr_reader :board, :display, :current_player
-  
-  def initialize board=Board.new, display=Display
-    @board = board
-    @display = display.new(board)
-    @current_player = :white
-  end
+    include Displayable
+  	attr_reader :board, :current_player
+    
+    def initialize board=Board.new
+      @board = board
+      @current_player = :white
+    end
 
-  def play
-  	loop do
-        puts "Captured pieces: #{board.captured_pieces.map(&:name)}"
-    		display.render
-    		print "Select a piece: "
-    		inp = gets.chomp.split("").map(&:to_i)
-    		print "Select a position to move: "
-    		inp2= gets.chomp.split("").map(&:to_i)
-    		piece = board.select_piece(inp, :white)
-    		piece.board = board
-    		piece.destination_position = inp2
-    		piece.move!
- 		end
-  end
+    def play
+    	loop do
+          board.current_player_color = current_player #add . color later
+          puts "King at #{board.king.current_position}"
+          puts "Captured pieces: #{board.captured_pieces.map(&:name)}"
+          puts "King in check? #{board.in_check?}"
+      	  render(board.grid)
+      		print "Select a piece: "
+      		inp = gets.chomp.split("").map(&:to_i)
+          piece = board.select_piece(inp)
+          puts "possible_moves: #{piece.possible_moves}"
+          puts "safe_moves: #{piece.safe_moves}"
+      		print "Select a position to move: "
+      		inp2= gets.chomp.split("").map(&:to_i)
+
+      		piece.destination_position = inp2
+      		piece.move!
+          @current_player = @current_player == :white ? :black : :white
+   		end
+    end
+
   end
 end
-
+#TO DO
+#add pawn promotion
+#add check and checkmate detections
+#add stalemate detection
+#add players
+#create the gameflow
+#add ai
 Chess::Game.new.play

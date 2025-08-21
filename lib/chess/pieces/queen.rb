@@ -1,10 +1,10 @@
 module Chess
   class Queen < Piece
-    include Validator::Slidable::All
+    include Validatable::Slidable::All
     attr_reader :name
 
-    def initialize color, current_position
-      super(color, current_position)
+    def initialize color, current_position, board
+      super(color, current_position, board)
       @name = :queen
     end
     def move!

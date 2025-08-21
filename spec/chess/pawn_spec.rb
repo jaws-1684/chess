@@ -1,4 +1,4 @@
-require 'chess/validator'
+require 'chess/validatable'
 require 'chess/board'
 require 'chess/piece'
 require "colorize"
@@ -8,6 +8,7 @@ module Chess
 		let(:board) { Board.new }
 		before do
 			$stdout = StringIO.new
+			board.current_player_color = :white
 		end
 
 		context "when white" do

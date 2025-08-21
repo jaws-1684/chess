@@ -10,7 +10,7 @@ module Chess
       @enpassant_vulnerable = false
     end
     def generate_temporary_pawn!
-      temporary_pawn = Pawn.new(self.color, [dx-direction, dy])
+      temporary_pawn = Pawn.new(self.color, [dx-direction, dy], board)
       temporary_pawn.enpassant_vulnerable = true
       temporary_pawn.symbol = self.symbol.colorize(:red)
       board.temporary_pawn = temporary_pawn
@@ -28,11 +28,11 @@ module Chess
   end
 
   class Pawn < Piece
-    include Validator::Stepable
+    include Validatable::Stepable
     attr_reader :name, :first_move, :direction
     attr_accessor :enpassant_vulnerable
-    def initialize color, current_position
-      super(color, current_position)
+    def initialize color, current_position, board
+      super(color, current_position, board)
       @name = :pawn
       @direction = (color == :white) ? 1 : -1
       @first_move = true

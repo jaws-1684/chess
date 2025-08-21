@@ -17,6 +17,9 @@ module Chess
       (destination_position == possible_moves.kingside_castle) || 
         (destination_position == possible_moves.queenside_castle)
     end
+    def valid_castle? type
+      !self.has_moved && (rook(type) != nil) && !rook(type).has_moved
+    end
     def castle!
       case destination_position
         when possible_moves.kingside_castle
@@ -25,14 +28,15 @@ module Chess
           rook_move!(:queenside) { [px, 3] }
       end
     end
+    
   end
 
   class King < Piece
-    include Validator::Adjoinable
+    include Validatable::Adjoinable
     attr_reader :name, :has_moved 
 
-    def initialize color, current_position
-      super(color, current_position)
+    def initialize color, current_position, board
+      super(color, current_position, board)
       @name = :king
       @has_moved = false
     end
@@ -43,11 +47,12 @@ module Chess
         @has_moved = true
       end
     end
-    private
-    include Castle
-    def assign_symbol
-      color == :white ? "♔" : "♚"
-    end
 
+    private
+      include Castle
+      def assign_symbol
+        color == :white ? "♔" : "♚"
+      end
+      
   end
 end

@@ -1,10 +1,10 @@
 module Chess
   class Knight < Piece
-    include Validator::Lshapable
+    include Validatable::Lshapable
     attr_reader :name
 
-    def initialize color, current_position
-      super(color, current_position)
+    def initialize color, current_position, board
+      super(color, current_position, board)
       @name = :knight
     end
 
