@@ -1,5 +1,5 @@
-require_relative "validatable"
-require_relative "pathable"
+require_relative "actionable"
+require_relative "unpackable"
 
 module Chess
   module Coordinates
@@ -20,11 +20,8 @@ module Chess
   end
   
   class Piece
-    include Coordinates
-    include Validatable::Path
-    include Pathable::Generator
-    attr_reader :color, :current_position, :last_position, :board
-    attr_accessor :destination_position, :symbol
+    attr_reader :color, :current_position, :last_position, :board, :symbol
+    attr_accessor :destination_position
 
     def initialize color, current_position, board
       @color = color
@@ -35,12 +32,15 @@ module Chess
 
     def move!
       raise "Destination position is missing!" unless destination_position
-      raise "Not a valid #{self.name} move!" unless valid_move?
-      raise "Path is not clear!" unless path_clear?
+      raise "Not a valid #{self.name} move!" unless 
+      raise "Path is not clear!" unless board.path_clear?(current_position, destination_position)
       raise "You cannot move over your own #{piece.name}!" if piece&.friendly?(self)
-      raise "You cannot place you own king into check!" unless safe_moves.include?(destination_position)
+      # raise "You cannot place you own king into check!" unless safe_moves.include?(destination_position)
 
       puts "Moving to #{destination_position}."
+    end
+    def valid_move?
+      valid_moves.include?(destination_position)
     end
     def friendly? other_piece
       other_piece&.color == self.color
@@ -48,33 +48,19 @@ module Chess
     def enemy? other_piece
       other_piece&.color != self.color
     end
-    def piece
-      board[dx, dy]
+    def piece square=destination_position
+      unpack(square) { |dx, dy| board[dx, dy] }
     end
     def enemy
       piece if piece&.enemy?(self)
     end
-    def can_attack? position
-      temp = destination_position
-      self.destination_position = position
-      return false if self&.friendly?(piece) 
-      valid_move? && path_clear?
-      ensure
-        self.destination_position = temp
-    end
-    def safe_moves moves=possible_moves
-      moves.each_with_object([]) do |position, a|
-        with_cloned_board do |board|
-          piece = self.clone
-          piece.destination_position = position
-          piece.basic_move(board)
-          a << position unless board.in_check?
-        end
-      end
+    def can_attack? square
+      self.valid_moves.include?(square)
     end
     def any_safe_moves?
       safe_moves.empty? ? false : true
     end
+
     def basic_move board=self.board, &block   
       yield if block_given? 
 
@@ -84,20 +70,35 @@ module Chess
       board.update!(self, last_position, current_position)
       @destination_position = nil    
     end
-    private  
+
+    # private
+      include Coordinates
+      include Unpackable
       def assign_symbol
         raise NotImplementedError, "Subclasses must implement the assign_symbol method"
       end
-      def with_cloned_board &block
+      def cloned_board &block
         yield(board.dup) if block_given?
       end
+      def valid_moves
+        possible_moves.reject { |position| !board.valid_position?(position) }.select(&valid) 
+      end
+      def safe_moves 
+        valid_moves.each_with_object([]) do |position, a|
+          cloned_board do |board|
+            piece = self.clone
+            piece.destination_position = position
+            piece.basic_move(board)
+            a << position unless board.in_check?
+          end
+        end
+      end
       def valid
-        proc { |move| board.valid_position?(move) && self.can_attack?(move) }
+        proc { |position| !piece(position)&.friendly?(self) && board.path_clear?(self.current_position, position) }
       end
   end
 end
 
-require "ostruct"
 require_relative "pieces/bishop"
 require_relative "pieces/king"
 require_relative "pieces/knight"

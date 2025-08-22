@@ -24,8 +24,9 @@ module Chess
       	  render(board.grid)
       		print "Select a piece: "
       		inp = gets.chomp.split("").map(&:to_i)
-          piece = board.select_piece(inp)
+          piece = board.get_piece(inp)
           puts "possible_moves: #{piece.possible_moves}"
+          puts "valid_moves: #{piece.valid_moves}"
           puts "safe_moves: #{piece.safe_moves}"
       		print "Select a position to move: "
       		inp2= gets.chomp.split("").map(&:to_i)

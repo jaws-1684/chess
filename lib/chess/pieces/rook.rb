@@ -1,7 +1,8 @@
 module Chess
   class Rook < Piece
-    include Validatable::Slidable::Straight
-    attr_reader :name,:has_moved 
+    include Actionable::Slidable::Straight
+    attr_reader :name,:has_moved
+    alias_method :possible_moves, :straight_moves 
     
     def initialize color, current_position, board
       super(color, current_position, board)
@@ -12,11 +13,12 @@ module Chess
       super
       basic_move { @has_moved = true }
     end
-    private
     
-    def assign_symbol
-      color == :white ? "♖" : "♜"
-    end
+    private
+     
+      def assign_symbol
+        color == :white ? "♖" : "♜"
+      end
   end
 end
 

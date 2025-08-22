@@ -1,4 +1,3 @@
-require 'chess/validatable'
 require 'chess/board'
 require 'chess/piece'
 require "colorize"
@@ -36,10 +35,10 @@ module Chess
 			end
 
 			it "cannot double step if the path is not clear" do
-		  	enemy = described_class.new(:black, [2, 1], board)
+		  	enemy = described_class.new(:white, [2, 1], board)
 				board.add_to_cell([2, 1], enemy)
 				subject.destination_position = [3, 1]
-				expect(subject.path_clear?).to eq false
+				expect(subject.valid_move?).to eq false
 		  end
 
 			it "cannot double_step if its not the first move" do
@@ -122,7 +121,7 @@ module Chess
 		  	enemy = described_class.new(:black, [5, 1], board)
 				board.add_to_cell([5, 1], enemy)
 				subject.destination_position = [4, 1]
-				expect(subject.path_clear?).to eq false
+				expect(subject.valid_move?).to eq false
 		  end
 		  it "cannot double_step if its not the first move" do
 		    subject.destination_position = [4, 1]

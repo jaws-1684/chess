@@ -28,7 +28,7 @@ module Chess
   end
 
   class Pawn < Piece
-    include Validatable::Stepable
+    include Actionable::Stepable
     attr_reader :name, :first_move, :direction
     attr_accessor :enpassant_vulnerable
     def initialize color, current_position, board
@@ -42,13 +42,13 @@ module Chess
     def move!
       super
       basic_move do
-        enpassant_action
+        # enpassant_action
         @first_move = false 
       end
     end
 
     private
-      include Enpassant
+      # include Enpassant
       def assign_symbol
         color == :white ? "♙" : "♟"
       end
