@@ -1,9 +1,7 @@
 module Chess
   class Rook < Piece
-    include Actionable::Slidable::Straight
     attr_reader :name,:has_moved
-    alias_method :possible_moves, :straight_moves 
-    
+  
     def initialize color, current_position, board
       super(color, current_position, board)
       @name = :rook
@@ -15,10 +13,11 @@ module Chess
     end
     
     private
-     
+      include Actionable::Slidable::Straight
       def assign_symbol
         color == :white ? "♖" : "♜"
       end
+      alias_method :possible_moves, :straight_moves 
   end
 end
 

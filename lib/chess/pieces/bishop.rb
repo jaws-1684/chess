@@ -1,8 +1,6 @@
 module Chess
   class Bishop < Piece
-    include Actionable::Slidable::Diagonal
     attr_reader :name
-    alias_method :possible_moves, :diagonal_moves
 
     def initialize color, current_position, board
       super(color, current_position, board)
@@ -14,8 +12,10 @@ module Chess
       basic_move
     end
       private
+      include Actionable::Slidable::Diagonal
       def assign_symbol
         color == :white ? "♗" : "♝"
       end
+      alias_method :possible_moves, :diagonal_moves
   end
 end

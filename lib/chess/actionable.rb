@@ -13,7 +13,7 @@ module Chess
 			def step
 				[px + direction, py]
 			end
-			def valid_attack? square=destination_position
+			def valid_base_attack? square=destination_position
 		  	return true if piece(square)&.enemy?(self) 
 		  end
 
@@ -21,11 +21,12 @@ module Chess
 				@possible_moves = Array.new
 
 				@possible_moves << step if board.clear_destination?(step)
-				@possible_moves << double_step if first_move 
+				@possible_moves << double_step if first_move && board.clear_destination?(double_step)
 
-				@possible_moves << attack_right if valid_attack?(attack_right)
-				@possible_moves << attack_left if valid_attack?(attack_left)
-
+				@possible_moves << attack_right if valid_base_attack?(attack_right)
+				@possible_moves << attack_left if valid_base_attack?(attack_left)
+				@possible_moves << board.rememberable.dig(:enpassant_pawn, :passed_square) if valid_enpassant_attack?
+			
 				@possible_moves
 			end
 		end

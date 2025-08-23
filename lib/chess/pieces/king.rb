@@ -1,3 +1,5 @@
+require_relative "../rememberable"
+
 module Chess
   module Castle
     def rook place
@@ -12,6 +14,20 @@ module Chess
       rook(type).destination_position = yield
       rook(type).move!
     end
+
+    def safe_adjacent_square? type
+      squares = {
+        left: [px, py-1],
+        right: [px, py+1]
+      }
+      case type
+        when :kingside
+           board.squares_under_attack.include? squares[:right]
+        when :queenside
+           board.squares_under_attack.include? squares[:left]
+      end      
+    end
+
     def kingside_castle
       [px, py+2]
     end
@@ -22,7 +38,7 @@ module Chess
       (destination_position == kingside_castle) || (destination_position == queenside_castle)
     end
     def valid_castle? type
-      !self.has_moved && (rook(type) != nil) && !rook(type).has_moved && !board.in_check?
+      !self.has_moved && (rook(type) != nil) && !rook(type).has_moved && safe_adjacent_square?(type)
     end
     def castle!
       case destination_position
@@ -36,7 +52,6 @@ module Chess
   end
 
   class King < Piece
-    include Actionable::Adjoinable
     attr_reader :name, :has_moved 
 
     def initialize color, current_position, board
@@ -49,11 +64,13 @@ module Chess
       basic_move do
         castle! if castle_move?
         @has_moved = true
+        board.rememberable.memoize("#{self.color}_king", position: destination_position)
       end
     end
 
     private
       include Castle
+      include Actionable::Adjoinable
       def assign_symbol
         color == :white ? "♔" : "♚"
       end

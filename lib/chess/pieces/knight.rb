@@ -1,6 +1,5 @@
 module Chess
   class Knight < Piece
-    include Actionable::Lshapable
     attr_reader :name
     
     def initialize color, current_position, board
@@ -13,7 +12,7 @@ module Chess
       basic_move
     end
     private
-      
+      include Actionable::Lshapable
       def assign_symbol
         color == :white ? "♘" : "♞"
       end

@@ -1,7 +1,5 @@
 module Chess
   class Queen < Piece
-    include Actionable::Slidable::Straight
-    include Actionable::Slidable::Diagonal
     attr_reader :name
 
     def initialize color, current_position, board
@@ -18,6 +16,8 @@ module Chess
     end
     
     private
+      include Actionable::Slidable::Straight
+      include Actionable::Slidable::Diagonal
       def assign_symbol
         color == :white ? "♕" : "♛"
       end

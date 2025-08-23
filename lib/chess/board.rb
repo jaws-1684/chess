@@ -1,19 +1,23 @@
 require_relative "./gamestate/gamestate"
 require_relative "validatable"
 require_relative "unpackable"
+require_relative "rememberable"
 
 module Chess
   class Board
     include Gamestate::Check
     include Gamestate::Checkmate
     include Validatable
+    attr_reader :rememberable,  :squares_under_attack
     attr_accessor :grid, :captured_pieces, :current_player_color
     alias_method :color, :current_player_color
     
-    def initialize
+    def initialize memo=Rememberable.new
       @grid = Array.new(8) { Array.new(8) }
       @captured_pieces = []
       @moves = []
+      @rememberable = memo
+      @squares_under_attack = []
       populate_board
     end
     
@@ -22,10 +26,9 @@ module Chess
       clear_cell(last_position)
       @moves << destination_position
 
-      #removing the marked enpassant square from the board if not attacked
-      # if marked square and the color id != than color
-      #  Rememberable.forget(enpassant)
-      # end
+      #removing the marked enpassant square from the board in the next opponent move regardless is its attacked or not
+      #also ensuring that the enpassant_vulnerable flag is reset
+      handle_enpassant! if enpassant_pawn_exists?
     end
     def select_square position
       unpack(position) { |x, y| self[x, y] }
@@ -37,7 +40,6 @@ module Chess
       raise "You can select only #{color} pieces!" unless piece.color == color 
       piece
     end
-
     def pieces
       grid.flatten.compact
     end
@@ -47,10 +49,16 @@ module Chess
     def players_pieces
       pieces.select {|piece| piece.color == color }
     end
-    def king
-      pieces.select(&current_king).first
+    def king_position
+      rememberable.dig("#{color}_king", :position)
     end
-    
+    def mark_squares_under_attack!
+      0.upto(7) do |i|
+        0.upto(7) do |j|
+          @squares_under_attack << [i, j] if enemies.any? { |enemy| enemy.can_attack?([i, j]) }
+        end
+      end
+    end
     def to_marshal
       {
         grid: @grid,
@@ -105,8 +113,15 @@ module Chess
       @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
       # @grid[6] = Array.new(8) { |i| nil }
     end
-    def current_king
-      proc {|piece| piece.is_a?(King) && piece.color == color }
+    def handle_enpassant!
+      pawn_position = rememberable.dig(:enpassant_pawn, :current_square)
+      pawn = select_square(pawn_position)
+
+      pawn.enpassant_vulnerable = false if pawn
+      rememberable.destroy!(:enpassant_pawn)
+    end
+    def enpassant_pawn_exists?
+      rememberable[:enpassant_pawn] && rememberable[:enpassant_pawn][:color] != current_player_color
     end
   end
 end

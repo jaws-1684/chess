@@ -2,7 +2,7 @@ module Chess
 	module Gamestate
 		module Check
 			def in_check? 
-				enemies.any? { |enemy| enemy.can_attack?(king.current_position) }
+				enemies.any? { |enemy| enemy.can_attack?(king_position) }
 			end
 		end
 

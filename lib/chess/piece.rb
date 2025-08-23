@@ -32,15 +32,18 @@ module Chess
 
     def move!
       raise "Destination position is missing!" unless destination_position
-      raise "Not a valid #{self.name} move!" unless 
+      raise "Not a valid #{self.name} move!" unless valid_move?
       raise "Path is not clear!" unless board.path_clear?(current_position, destination_position)
       raise "You cannot move over your own #{piece.name}!" if piece&.friendly?(self)
-      # raise "You cannot place you own king into check!" unless safe_moves.include?(destination_position)
+      raise "You cannot place you own king into check!" unless safe_move?
 
       puts "Moving to #{destination_position}."
     end
     def valid_move?
       valid_moves.include?(destination_position)
+    end
+    def safe_move?
+      safe_moves.include?(destination_position)
     end
     def friendly? other_piece
       other_piece&.color == self.color
@@ -55,7 +58,7 @@ module Chess
       piece if piece&.enemy?(self)
     end
     def can_attack? square
-      self.valid_moves.include?(square)
+      valid_moves.include?(square)
     end
     def any_safe_moves?
       safe_moves.empty? ? false : true
@@ -68,12 +71,13 @@ module Chess
       @current_position = destination_position
       board.captured_pieces << enemy if !!enemy
       board.update!(self, last_position, current_position)
-      @destination_position = nil    
+      @destination_position = nil
     end
 
-    # private
+    private
       include Coordinates
       include Unpackable
+
       def assign_symbol
         raise NotImplementedError, "Subclasses must implement the assign_symbol method"
       end
@@ -83,7 +87,7 @@ module Chess
       def valid_moves
         possible_moves.reject { |position| !board.valid_position?(position) }.select(&valid) 
       end
-      def safe_moves 
+      def safe_moves
         valid_moves.each_with_object([]) do |position, a|
           cloned_board do |board|
             piece = self.clone

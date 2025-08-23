@@ -48,9 +48,7 @@ module Chess
 				expect(subject.valid_move?).to eq false
 			end
 			it "cannot move backwards" do
-				subject.destination_position = [2, 1]
-				subject.move!
-				subject.destination_position = [1, 1]
+				subject.destination_position = [0, 1]
 				expect(subject.valid_move?).to eq false
 			end
 			it "cannot move diagonally if the square is empty" do
@@ -64,28 +62,33 @@ module Chess
 				expect(subject.valid_move?).to eq false
 			end
 			context "when enpassant" do
-				it "removes the original pawn when attacked" do
+				let(:enemy) { described_class.new(:black, [3, 0], board) }
+				before do
+					board.add_to_cell([3, 0], enemy)
 					subject.destination_position = [3, 1]
 					subject.move!
-
-					enemy = described_class.new(:black, [3, 0], board)
-					board.add_to_cell([3, 0], enemy)
+					board.current_player_color = :black
+				end
+				it "removes the original pawn when attacked" do
 					enemy.destination_position = [2, 1]
 					enemy.move!
 					expect(board[3, 1]).to be_nil
 				end
-				it "creates a temporary pawn" do
-					subject.destination_position = [3, 1]
-					subject.move!
-					expect(board[2, 1]).to be_a Pawn
+				it "markes the passed square" do
+					expect(board.rememberable[:enpassant_pawn][:passed_square]).to eq [2, 1]
 				end
-				it "dissapears if not attacked in the next move" do
-					subject.destination_position = [3, 1]
-					subject.move!
-					enemy = board[6, 0]
-					enemy.destination_position = [5, 0]
+				it "unmarkes position if not attacked in the next move" do
+					enemy.destination_position = [2, 0]
 					enemy.move!
-					expect(board[2, 1]).to be_nil
+					expect(board.rememberable[:enpassant_pawn]).to be_nil
+				end
+				it "sets the enpassant flag" do
+					expect(subject.enpassant_vulnerable?).to be_truthy
+				end
+				it "resets the enpassant flag" do
+					enemy.destination_position = [2, 0]
+					enemy.move!
+					expect(subject.enpassant_vulnerable?).to be_falsey
 				end
 			end  
 			
@@ -93,6 +96,9 @@ module Chess
 
 		context "when black" do
 		  subject(:pawn) { board[6, 1] }
+		  before do
+				board.current_player_color = :black
+			end
 		  
 		  it "can step" do
 		    subject.destination_position = [5, 1]
@@ -150,29 +156,34 @@ module Chess
 		  end
 		  
 		  context "when enpassant" do
-		  	it "removes the original pawn when attacked" do
-					subject.destination_position = [4, 1]
+		  	let(:enemy) { described_class.new(:white, [4, 2], board) }
+		  	before do
+		  		board.add_to_cell([4, 2], enemy)
+		  		subject.destination_position = [4, 1]
 					subject.move!
-					enemy = described_class.new(:white, [4, 2], board)
-					board.add_to_cell([4, 2], enemy)
+					board.current_player_color = :white
+		  	end
+		  	it "removes the original pawn when attacked" do
 					enemy.destination_position = [5, 1]
 					enemy.move!
-					expect(board[4, 2]).to be_nil
+					expect(board[4, 1]).to be_nil
 				end
-		    it "creates a temporary pawn" do
-		      subject.destination_position = [4, 1]
-		      subject.move!
-		      expect(board[5, 1]).to be_a Pawn
-		    end
-		    
-		    it "disappears if not attacked in the next move" do
-		      subject.destination_position = [4, 1]
-		      subject.move!
-		      enemy = board[1, 0]
-		      enemy.destination_position = [2, 0]
+		    it "markes the passed square" do
+					expect(board.rememberable[:enpassant_pawn][:passed_square]).to eq [5, 1]
+				end		    
+		    it "unmarkes position if not attacked in the next move" do
+		      enemy.destination_position = [5, 2]
 		      enemy.move!
-		      expect(board[5, 1]).to be_nil
+		      expect(board.rememberable[:enpassant_pawn]).to be_nil
 		    end
+		    	it "sets the enpassant flag" do
+					expect(subject.enpassant_vulnerable?).to be_truthy
+				end
+				it "resets the enpassant flag" do
+					enemy.destination_position = [5, 2]
+					enemy.move!
+					expect(subject.enpassant_vulnerable?).to be_falsey
+				end
 		  end
 	 	end
 	end
