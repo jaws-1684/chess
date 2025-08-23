@@ -24,6 +24,7 @@ module Chess
       unpack(position) { |x, y|  @grid[x][y].is_a? kind }
     end
     def clear_destination? position
+    	return false unless valid_position?(position)
       unpack(position) { |x, y|  @grid[x][y] == nil }
     end
     

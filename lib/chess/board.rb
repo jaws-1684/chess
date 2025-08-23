@@ -98,7 +98,7 @@ module Chess
         Knight.new(:white, [0, 6], self),
         Rook.new(:white,   [0, 7], self)
       ]
-      @grid[1] = Array.new(8) { |i| Pawn.new(:white, [1, i], self) }
+      @grid[6] = Array.new(8) { |i| Pawn.new(:white, [6, i], self) }
       # @grid[1] = Array.new(8) { |i| nil }
       @grid[7] = [
         Rook.new(:black,   [7, 0], self),
@@ -110,7 +110,7 @@ module Chess
         Knight.new(:black, [7, 6], self),
         Rook.new(:black,   [7, 7], self)
       ]
-      @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
+      # @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
       # @grid[6] = Array.new(8) { |i| nil }
     end
     def handle_enpassant!

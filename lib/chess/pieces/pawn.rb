@@ -7,7 +7,7 @@ module Chess
       [piece([px, py+1]), piece([px, py-1])]
     end
     def valid_enpassant_attack?
-      adjacent_pieces.any? { |piece| piece&.enemy?(self) && piece&.enpassant_vulnerable? }
+      adjacent_pieces.any? { |piece| piece.is_a?(Pawn) && piece&.enemy?(self) && piece&.enpassant_vulnerable? }
     end
     def enpassant_capture?
       #checking the passed square
@@ -21,6 +21,29 @@ module Chess
     end
     def destroy_enemy!
       board.clear_cell(enpassant_enemy.current_position)
+    end
+  end
+  module Promotion
+    def final_row?
+      color == :black ? px == 0 : px == 7
+    end
+    def promote!
+      puts "Select a piece you want (Q/B/K/R):\s".colorize(:green)
+      inp = gets.chomp.downcase
+      piece = nil
+      case inp
+        when "q"
+          piece = Queen.new(self.color, [px, py], self.board)
+        when "b"
+          piece = Bishop.new(self.color, [px, py], self.board)
+        when "k"
+          piece = Knight.new(self.color, [px, py], self.board)
+        when "r"
+          piece = Rook.new(self.color, [px, py], self.board)
+        else
+          piece = self           
+      end
+      board.update!(piece, last_position, current_position)
     end
   end
 
@@ -50,13 +73,16 @@ module Chess
           board.captured_pieces << enpassant_enemy
           destroy_enemy!
         end
+
         @first_move = false 
       end
+      promote! if final_row?
     end
 
     private
       include Actionable::Stepable
       include Enpassant
+      include Promotion
       def assign_symbol
         color == :white ? "♙" : "♟"
       end

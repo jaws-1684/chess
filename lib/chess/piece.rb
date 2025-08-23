@@ -64,13 +64,13 @@ module Chess
       safe_moves.empty? ? false : true
     end
 
-    def basic_move board=self.board, &block   
+    def basic_move board=self.board, &block
       yield if block_given? 
 
       @last_position = @current_position
       @current_position = destination_position
       board.captured_pieces << enemy if !!enemy
-      board.update!(self, last_position, current_position)
+      board.update!(piece, last_position, current_position)
       @destination_position = nil
     end
 

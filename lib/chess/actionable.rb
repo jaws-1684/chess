@@ -14,6 +14,7 @@ module Chess
 				[px + direction, py]
 			end
 			def valid_base_attack? square=destination_position
+				return false unless board.valid_position?(square)
 		  	return true if piece(square)&.enemy?(self) 
 		  end
 
