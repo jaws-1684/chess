@@ -11,7 +11,7 @@ module Chess
     end
     def enpassant_capture?
       #checking the passed square
-      #if there is no enpassant pawn this will return nil or true
+      #if there is no enpassant pawn this will return false
       destination_position == board.rememberable.dig(:enpassant_pawn, :passed_square)
     end
     def enpassant_enemy
@@ -65,8 +65,6 @@ module Chess
         if enpassant_vulnerable_move?
           @enpassant_vulnerable = true
           board.rememberable.memoize(:enpassant_pawn, color: self.color, passed_square: [px+direction, py], current_square: destination_position)
-        else
-          @enpassant_vulnerable = false  
         end
 
         if enpassant_capture?

@@ -2,13 +2,15 @@ require_relative "./gamestate/gamestate"
 require_relative "validatable"
 require_relative "unpackable"
 require_relative "rememberable"
+require_relative "displayable"
+
 
 module Chess
   class Board
     include Gamestate::Check
     include Gamestate::Checkmate
     include Validatable
-    attr_reader :rememberable,  :squares_under_attack
+    attr_reader :rememberable, :squares_under_attack
     attr_accessor :grid, :captured_pieces, :current_player_color
     alias_method :color, :current_player_color
     
@@ -22,7 +24,10 @@ module Chess
     end
     
     def update! piece, last_position, destination_position
+      render(@grid)
+
       add_to_cell(destination_position, piece)
+      render(@grid)
       clear_cell(last_position)
       @moves << destination_position
 
@@ -71,13 +76,13 @@ module Chess
       @captured_pieces = data[:captured_pieces]
     end
     def clear_cell position
-      @grid[position[0]][position[1]] = nil
+      grid[position[0]][position[1]] = nil
     end
     def add_to_cell position, piece
-      @grid[position[0]][position[1]] = piece
+      grid[position[0]][position[1]] = piece
     end
     def [] x, y
-      @grid[x][y]
+      grid[x][y]
     end
     def dup
       Marshal.load(Marshal.dump(self))
@@ -86,8 +91,6 @@ module Chess
     private
     include Unpackable
     def populate_board
-      @grid = Array.new(8) { Array.new(8) }
-
       @grid[0] = [
         Rook.new(:white, [0, 0], self),
         Knight.new(:white, [0, 1], self),
@@ -98,8 +101,7 @@ module Chess
         Knight.new(:white, [0, 6], self),
         Rook.new(:white,   [0, 7], self)
       ]
-      @grid[6] = Array.new(8) { |i| Pawn.new(:white, [6, i], self) }
-      # @grid[1] = Array.new(8) { |i| nil }
+      @grid[1] = Array.new(8) { |i| Pawn.new(:white, [1, i], self) }
       @grid[7] = [
         Rook.new(:black,   [7, 0], self),
         Knight.new(:black, [7, 1], self),
@@ -110,8 +112,7 @@ module Chess
         Knight.new(:black, [7, 6], self),
         Rook.new(:black,   [7, 7], self)
       ]
-      # @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
-      # @grid[6] = Array.new(8) { |i| nil }
+      @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
     end
     def handle_enpassant!
       pawn_position = rememberable.dig(:enpassant_pawn, :current_square)

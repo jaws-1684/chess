@@ -19,7 +19,6 @@ module Chess
     def play
     	loop do
           board.current_player_color = current_player #add . color later
-          board.mark_squares_under_attack!
           puts "King at #{board.king_position}"
           puts "Captured pieces: #{board.captured_pieces.map(&:name)}"
           puts "King in check? #{board.in_check?}"
