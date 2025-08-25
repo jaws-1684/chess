@@ -5,7 +5,7 @@ require "colorize"
 
 module Chess
 	describe Board do
-		subject(:board) { board = Board.new(populate: false) }
+		subject(:board) { }
 		before do
 			board.current_player_color = :black 
 			board.grid = Array.new(8) { Array.new(8) }

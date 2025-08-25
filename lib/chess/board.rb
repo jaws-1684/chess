@@ -2,8 +2,6 @@ require_relative "./gamestate/gamestate"
 require_relative "validatable"
 require_relative "unpackable"
 require_relative "rememberable"
-require_relative "displayable"
-
 
 module Chess
   class Board
@@ -15,7 +13,7 @@ module Chess
     alias_method :color, :current_player_color
     
     def initialize memo=Rememberable.new
-      @grid = Array.new(8) { Array.new(8) }
+      @grid = Array.new(8) { Array.new(8) { nil } }
       @captured_pieces = []
       @moves = []
       @rememberable = memo
@@ -24,10 +22,7 @@ module Chess
     end
     
     def update! piece, last_position, destination_position
-      render(@grid)
-
       add_to_cell(destination_position, piece)
-      render(@grid)
       clear_cell(last_position)
       @moves << destination_position
 
@@ -76,13 +71,13 @@ module Chess
       @captured_pieces = data[:captured_pieces]
     end
     def clear_cell position
-      grid[position[0]][position[1]] = nil
+      @grid[position[0]][position[1]] = nil
     end
     def add_to_cell position, piece
-      grid[position[0]][position[1]] = piece
+      @grid[position[0]][position[1]] = piece
     end
     def [] x, y
-      grid[x][y]
+      @grid[x][y]
     end
     def dup
       Marshal.load(Marshal.dump(self))

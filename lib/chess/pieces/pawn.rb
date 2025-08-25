@@ -27,24 +27,22 @@ module Chess
     def final_row?
       color == :black ? px == 0 : px == 7
     end
-    def promote!
-      puts "Select a piece you want (Q/B/K/R):\s".colorize(:green)
-      inp = gets.chomp.downcase
-      piece = nil
-      case inp
-        when "q"
-          piece = Queen.new(self.color, [px, py], self.board)
-        when "b"
-          piece = Bishop.new(self.color, [px, py], self.board)
-        when "k"
-          piece = Knight.new(self.color, [px, py], self.board)
-        when "r"
-          piece = Rook.new(self.color, [px, py], self.board)
-        else
-          piece = self           
-      end
-      board.update!(piece, last_position, current_position)
-    end
+    # def promote!
+    #   puts "Select a piece you want (Q/B/K/R):\s".colorize(:green)
+    #   inp = gets.chomp.downcase
+    #   piece = self
+    #   case inp
+    #     when "q"
+    #       piece = Queen.new(self.color, [px, py], self.board)
+    #     when "b"
+    #       piece = Bishop.new(self.color, [px, py], self.board)
+    #     when "k"
+    #       piece = Knight.new(self.color, [px, py], self.board)
+    #     when "r"
+    #       piece = Rook.new(self.color, [px, py], self.board)
+    #   end
+    #   board.update!(piece, last_position, current_position)
+    # end
   end
 
   class Pawn < Piece
@@ -74,13 +72,13 @@ module Chess
 
         @first_move = false 
       end
-      promote! if final_row?
+      # promote! if final_row?
     end
 
     private
       include Actionable::Stepable
       include Enpassant
-      include Promotion
+      # include Promotion
       def assign_symbol
         color == :white ? "♙" : "♟"
       end

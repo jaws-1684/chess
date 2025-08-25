@@ -70,7 +70,7 @@ module Chess
       @last_position = @current_position
       @current_position = destination_position
       board.captured_pieces << enemy if !!enemy
-      board.update!(piece, last_position, current_position)
+      board.update!(self, last_position, current_position)
       @destination_position = nil
     end
 
