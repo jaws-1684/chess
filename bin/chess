@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+require_relative "../lib/chess/piece"
+require_relative "../lib/chess/board"
+require_relative "../lib/chess/displayable"
+require "pry-byebug"
+require "colorize"
+require_relative "../lib/chess/rememberable"
+
+module Chess
+	class Game
+    include Displayable
+  	attr_reader :board, :current_player
+    
+    def initialize chess_board=Board.new
+      @board = chess_board
+      @current_player = :white
+      board.current_player_color = @current_player
+    end
+
+    def play
+    	until board.in_checkmate? || board.in_stalemate? do
+         #add . color later
+        puts "King at #{board.king_position}"
+        puts "Captured pieces: #{board.captured_pieces.map(&:name)}"
+        puts "King in check? #{board.in_check?}"
+        puts "memo: #{board.rememberable.data}"
+        puts "Sqaures unde attack #{board.squares_under_attack}"
+    	  render(board.grid)
+    		print "Select a piece: "
+    		inp = gets.chomp.split("").map(&:to_i)
+        piece = board.get_piece(inp)
+        puts "#{piece.valid_moves}"
+    		print "Select a position to move: "
+    		inp2= gets.chomp.split("").map(&:to_i)
+    		piece.destination_position = inp2
+    		piece.move!
+        @current_player = @current_player == :white ? :black : :white
+        board.current_player_color = current_player
+   		end
+    end
+
+  end
+end
+#TO DO
+#add pawn promotion
+#add check and checkmate detections
+#add stalemate detection
+#add players
+#create the gameflow
+#add ai
+Chess::Game.new.play

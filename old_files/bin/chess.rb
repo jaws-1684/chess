@@ -1,7 +1,17 @@
-#!/usr/bin/env ruby
-require_relative "../chess/piece"
-require_relative "../chess/board"
-require_relative "../chess/display"
+require_relative "../lib/core/board"
+require_relative "../lib/core/display"
+require_relative "../lib/core/move"
+require_relative '../lib/core/doome'
+require_relative '../lib/core/beacon'
+require_relative "../lib/pieces/piece"
+require_relative '../lib/pieces/rook'
+require_relative '../lib/pieces/knight'
+require_relative '../lib/pieces/bishop'
+require_relative '../lib/pieces/queen'
+require_relative '../lib/pieces/king'
+require_relative '../lib/pieces/pawn'
+
+
 class Game
   attr_reader :board, :display, :current_player
   
@@ -347,7 +357,7 @@ end
 
 
     
-# require 'colorize' or https://github.com/ku1ik/rainbow(might be better)
+require 'colorize' or https://github.com/ku1ik/rainbow(might be better)
 
 size = 8
 
