@@ -13,22 +13,21 @@ module Chess
 			def step
 				[px + direction, py]
 			end
-			def valid_base_attack? square=destination_position
-				return false unless board.valid_position?(square)
-		  	return true if piece(square)&.enemy?(self) 
+			def valid_pawn_attack? position
+				board.valid_position?(position) && piece(position)&.enemy?(self) 
 		  end
 
-		  def valid? move
-		  	board.clear_destination?(move) && board.valid_position?(move)
+		  def valid_pawn_move? position
+		  	board.valid_position?(position) && !board.is_a_piece?(position)
 		  end
 
 			def possible_moves
 				@possible_moves = Array.new
-				@possible_moves << step if valid?(step)
-				@possible_moves << double_step if first_move && valid?(double_step)
+				@possible_moves << step if valid_pawn_move?(step)
+				@possible_moves << double_step if first_move? && valid_pawn_move?(double_step)
 
-				@possible_moves << attack_right if valid_base_attack?(attack_right)
-				@possible_moves << attack_left if valid_base_attack?(attack_left)
+				@possible_moves << attack_right if valid_pawn_attack?(attack_right)
+				@possible_moves << attack_left if valid_pawn_attack?(attack_left)
 				@possible_moves << board.rememberable.dig(:enpassant_pawn, :passed_square) if valid_enpassant_attack?
 			
 				@possible_moves
@@ -37,22 +36,22 @@ module Chess
 
 		module Slidable
 			module Straight
-				def straight_moves x=px, y=py
+				def straight_moves
 				  (0..7).each_with_object([]) do |i,a|
-				    a << [x,i] unless i == y
-				    a << [i,y] unless i == x
-				  end
+				    a << [px,i] unless i == py
+				    a << [i,py] unless i == px
+				  end.uniq
 				end
 			end
 
 			module Diagonal
-				def diagonal_moves x=px, y=py
-				  (1..6).each_with_object([]) do |i,a|
-				  	a << [x+i, y+i]
-				    a << [x-i, y-i]
-				    a << [x+i, y-i]
-				    a << [x-i, y+1]
-				  end
+				def diagonal_moves
+				  (0..7).each_with_object([]) do |i,a|
+				  	a << [px+i, py+i]
+				    a << [px-i, py-i]
+				    a << [px+i, py-i]
+				    a << [px-i, py+i]
+				  end.uniq
 				end
 			end
 		end
@@ -63,7 +62,7 @@ module Chess
     		y = [1, 2, 2, 1, -1, -2, -2, -1];
     		(0..7).each_with_object([]) do |i, a|
     			a << [px + x[i], py + y[i]]
-    		end
+    		end.uniq
 			end
 		end
 

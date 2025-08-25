@@ -11,28 +11,31 @@ module Chess
     include Displayable
   	attr_reader :board, :current_player
     
-    def initialize board=Board.new
-      @board = board
+    def initialize chess_board=Board.new
+      @board = chess_board
       @current_player = :white
+      board.current_player_color = @current_player
     end
 
     def play
-    	loop do
-        board.current_player_color = current_player #add . color later
+    	until board.in_checkmate? || board.in_stalemate? do
+         #add . color later
         puts "King at #{board.king_position}"
         puts "Captured pieces: #{board.captured_pieces.map(&:name)}"
         puts "King in check? #{board.in_check?}"
+        puts "memo: #{board.rememberable.data}"
         puts "Sqaures unde attack #{board.squares_under_attack}"
     	  render(board.grid)
-        binding.pry
     		print "Select a piece: "
     		inp = gets.chomp.split("").map(&:to_i)
         piece = board.get_piece(inp)
+        puts "#{piece.valid_moves}"
     		print "Select a position to move: "
     		inp2= gets.chomp.split("").map(&:to_i)
     		piece.destination_position = inp2
     		piece.move!
         @current_player = @current_player == :white ? :black : :white
+        board.current_player_color = current_player
    		end
     end
 

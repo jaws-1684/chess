@@ -1,10 +1,7 @@
 module Chess
 	class Rememberable
 		def initialize
-			@data = {
-			"white_king" => { position: [0, 4] },
-			"black_king" => { position: [7, 4] },
-			}
+			@data = Hash.new
 		end
 		
 		def memoize piece, **options
@@ -18,6 +15,9 @@ module Chess
 		end
 		def [] option
 			@data[option]
+		end
+		def data
+			@data
 		end
 	end
 end

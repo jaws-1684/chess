@@ -74,7 +74,7 @@ module Chess
       @destination_position = nil
     end
 
-    private
+    # private
       include Coordinates
       include Unpackable
 
@@ -85,12 +85,12 @@ module Chess
         yield(board.dup) if block_given?
       end
       def valid_moves
-        possible_moves.reject { |position| !board.valid_position?(position) }.select(&valid) 
+        possible_moves.reject { |position| !board.valid_position?(position) }.select(&valid)
       end
-      def safe_moves
+      def safe_moves 
         valid_moves.each_with_object([]) do |position, a|
           cloned_board do |board|
-            piece = self.clone
+            piece = board.select_square(self.current_position)
             piece.destination_position = position
             piece.basic_move(board)
             a << position unless board.in_check?

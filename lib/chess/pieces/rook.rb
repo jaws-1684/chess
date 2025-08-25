@@ -1,7 +1,7 @@
 module Chess
   class Rook < Piece
     attr_reader :name,:has_moved
-  
+    alias_method :has_moved?, :has_moved
     def initialize color, current_position, board
       super(color, current_position, board)
       @name = :rook

@@ -16,7 +16,7 @@ module Chess
     end
 
     def safe_adjacent_square? type
-      #checking only the px+1 right and px-1 left squares cause the destination position is checking in the superclass and 
+      #checking only the px+1 right and px-1 left squares cause the destination position is checked in the superclass and 
       #the rook itself checks if its putting the king in check
       squares = {
         left: [px, py-1],
@@ -24,9 +24,9 @@ module Chess
       }
       case type
         when :kingside
-           !board.squares_under_attack.include? squares[:right]
+           !board.squares_under_attack.include?(squares[:right])
         when :queenside
-           !board.squares_under_attack.include? squares[:left]
+           !board.squares_under_attack.include?(squares[:left])
       end      
     end
 
@@ -40,7 +40,7 @@ module Chess
       (destination_position == kingside_castle) || (destination_position == queenside_castle)
     end
     def valid_castle? type
-      !self.has_moved && (rook(type) != nil) && !rook(type).has_moved && safe_adjacent_square?(type)
+      !self.has_moved? && (rook(type) != nil) && !rook(type).has_moved? && safe_adjacent_square?(type)
     end
     def castle!
       case destination_position
@@ -55,6 +55,7 @@ module Chess
 
   class King < Piece
     attr_reader :name, :has_moved 
+    alias_method :has_moved?, :has_moved
 
     def initialize color, current_position, board
       super(color, current_position, board)
@@ -66,7 +67,12 @@ module Chess
       basic_move do
         castle! if castle_move?
         @has_moved = true
+      end
+    end
+    def basic_move board=self.board, &block
+      super(board) do
         board.rememberable.memoize("#{self.color}_king", position: destination_position)
+        block.call if block_given?
       end
     end
 

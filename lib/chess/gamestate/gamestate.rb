@@ -12,7 +12,7 @@ module Chess
 				return false unless in_check?
 				players_pieces.none?(&:any_safe_moves?)
 			end
-			def stalemate?
+			def in_stalemate?
 				!in_check? && players_pieces.none?(&:any_safe_moves?)
 			end
 		end

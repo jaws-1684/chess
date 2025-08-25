@@ -1,7 +1,7 @@
 module Chess
   module Enpassant
     def enpassant_vulnerable_move?
-      first_move && destination_position == double_step
+      first_move? && destination_position == double_step
     end
     def adjacent_pieces
       [piece([px, py+1]), piece([px, py-1])]
@@ -27,28 +27,26 @@ module Chess
     def final_row?
       color == :black ? px == 0 : px == 7
     end
-    # def promote!
-    #   puts "Select a piece you want (Q/B/K/R):\s".colorize(:green)
-    #   inp = gets.chomp.downcase
-    #   piece = self
-    #   case inp
-    #     when "q"
-    #       piece = Queen.new(self.color, [px, py], self.board)
-    #     when "b"
-    #       piece = Bishop.new(self.color, [px, py], self.board)
-    #     when "k"
-    #       piece = Knight.new(self.color, [px, py], self.board)
-    #     when "r"
-    #       piece = Rook.new(self.color, [px, py], self.board)
-    #   end
-    #   board.update!(piece, last_position, current_position)
-    # end
+    def promote!
+      puts "Select a piece you want (Q/B/K/R):\s".colorize(:green)
+      choice = gets.chomp.downcase.to_sym
+      piece = case choice
+        when :q then Queen.new(self.color, [px, py], self.board)
+        when :b then Bishop.new(self.color, [px, py], self.board)
+        when :k then Knight.new(self.color, [px, py], self.board)
+        when :r then Rook.new(self.color, [px, py], self.board)
+        else Queen.new(self.color, [px, py], self.board)
+      end
+      board.update!(piece, last_position, current_position)
+    end
   end
 
   class Pawn < Piece
     attr_reader :name, :first_move, :direction
     attr_accessor :enpassant_vulnerable
     alias_method :enpassant_vulnerable?, :enpassant_vulnerable
+    alias_method :first_move?, :first_move
+
     def initialize color, current_position, board
       super(color, current_position, board)
       @name = :pawn
@@ -72,13 +70,13 @@ module Chess
 
         @first_move = false 
       end
-      # promote! if final_row?
+      promote! if final_row?
     end
 
     private
       include Actionable::Stepable
       include Enpassant
-      # include Promotion
+      include Promotion
       def assign_symbol
         color == :white ? "♙" : "♟"
       end

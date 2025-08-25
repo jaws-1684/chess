@@ -12,7 +12,7 @@ module Chess
     end
 
     def possible_moves
-        straight_moves.concat(diagonal_moves)
+      straight_moves + diagonal_moves
     end
     
     private

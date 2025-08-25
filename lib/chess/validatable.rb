@@ -20,8 +20,8 @@ module Chess
     def valid_position? position
       position[0].between?(0,7) && position[1].between?(0,7)
     end
-    def is_a_piece? position, kind=Piece
-      unpack(position) { |x, y|  @grid[x][y].is_a? kind }
+    def is_a_piece? position
+      unpack(position) { |x, y|  @grid[x][y].is_a?(Piece) }
     end
     def clear_destination? position
       unpack(position) { |x, y|  @grid[x][y] == nil }

@@ -8,24 +8,24 @@ module Chess
     include Gamestate::Check
     include Gamestate::Checkmate
     include Validatable
-    attr_reader :rememberable, :squares_under_attack
-    attr_accessor :grid, :captured_pieces, :current_player_color
+    attr_reader :grid, :rememberable, :squares_under_attack
+    attr_accessor :captured_pieces, :current_player_color
     alias_method :color, :current_player_color
     
-    def initialize memo=Rememberable.new
-      @grid = Array.new(8) { Array.new(8) { nil } }
+    def initialize memo=Rememberable.new, data=Array.new(8) { Array.new(8) { nil } }, chess_set:true
+      @grid = data
+      populate_board if chess_set
+
       @captured_pieces = []
       @moves = []
       @rememberable = memo
       @squares_under_attack = []
-      populate_board
     end
     
     def update! piece, last_position, destination_position
       add_to_cell(destination_position, piece)
       clear_cell(last_position)
       @moves << destination_position
-
       #removing the marked enpassant square from the board in the next opponent move regardless is its attacked or not
       #also ensuring that the enpassant_vulnerable flag is reset
       handle_enpassant! if enpassant_pawn_exists?
@@ -50,7 +50,7 @@ module Chess
       pieces.select {|piece| piece.color == color }
     end
     def king_position
-      rememberable.dig("#{color}_king", :position)
+      rememberable.dig("#{color}_king", :position) || find_current_king
     end
     def mark_squares_under_attack!
       0.upto(7) do |i|
@@ -62,13 +62,19 @@ module Chess
     def to_marshal
       {
         grid: @grid,
-        captured_pieces: @captured_pieces
+        captured_pieces: @captured_pieces,
+        moves: @moves,
+        rememberable: @rememberable,
+        squares_under_attack: @squares_under_attack
       }
     end
 
     def self.from_marshal data
       @grid = data[:grid]
       @captured_pieces = data[:captured_pieces]
+      @moves = data[:moves]
+      @rememberable = data[:rememberable]
+      @squares_under_attack = data[:squares_under_attack]
     end
     def clear_cell position
       @grid[position[0]][position[1]] = nil
@@ -84,40 +90,45 @@ module Chess
     end
 
     private
-    include Unpackable
-    def populate_board
-      @grid[0] = [
-        Rook.new(:white, [0, 0], self),
-        Knight.new(:white, [0, 1], self),
-        Bishop.new(:white, [0, 2], self),
-        Queen.new(:white,  [0, 3], self),
-        King.new(:white,   [0, 4], self),
-        Bishop.new(:white, [0, 5], self),
-        Knight.new(:white, [0, 6], self),
-        Rook.new(:white,   [0, 7], self)
-      ]
-      @grid[1] = Array.new(8) { |i| Pawn.new(:white, [1, i], self) }
-      @grid[7] = [
-        Rook.new(:black,   [7, 0], self),
-        Knight.new(:black, [7, 1], self),
-        Bishop.new(:black, [7, 2], self),
-        Queen.new(:black,  [7, 3], self),
-        King.new(:black,   [7, 4], self),
-        Bishop.new(:black, [7, 5], self),
-        Knight.new(:black, [7, 6], self),
-        Rook.new(:black,   [7, 7], self)
-      ]
-      @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
-    end
-    def handle_enpassant!
-      pawn_position = rememberable.dig(:enpassant_pawn, :current_square)
-      pawn = select_square(pawn_position)
+      include Unpackable
+      def populate_board
+        @grid[0] = [
+          Rook.new(:white, [0, 0], self),
+          Knight.new(:white, [0, 1], self),
+          Bishop.new(:white, [0, 2], self),
+          Queen.new(:white,  [0, 3], self),
+          King.new(:white,   [0, 4], self),
+          Bishop.new(:white, [0, 5], self),
+          Knight.new(:white, [0, 6], self),
+          Rook.new(:white,   [0, 7], self)
+        ]
+        @grid[1] = Array.new(8) { |i| Pawn.new(:white, [1, i], self) }
+        @grid[7] = [
+          Rook.new(:black,   [7, 0], self),
+          Knight.new(:black, [7, 1], self),
+          Bishop.new(:black, [7, 2], self),
+          Queen.new(:black,  [7, 3], self),
+          King.new(:black,   [7, 4], self),
+          Bishop.new(:black, [7, 5], self),
+          Knight.new(:black, [7, 6], self),
+          Rook.new(:black,   [7, 7], self)
+        ]
+        @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
+      end
+      def handle_enpassant!
+        pawn_position = rememberable.dig(:enpassant_pawn, :current_square)
+        pawn = select_square(pawn_position)
 
-      pawn.enpassant_vulnerable = false if pawn
-      rememberable.destroy!(:enpassant_pawn)
-    end
-    def enpassant_pawn_exists?
-      rememberable[:enpassant_pawn] && rememberable[:enpassant_pawn][:color] != current_player_color
-    end
+        pawn.enpassant_vulnerable = false if pawn
+        rememberable.destroy!(:enpassant_pawn)
+      end
+      def enpassant_pawn_exists?
+        rememberable[:enpassant_pawn] && rememberable[:enpassant_pawn][:color] != current_player_color
+      end
+      def find_current_king
+        king = pieces.select { |piece| piece.color == color && piece.is_a?(King) }.first
+        rememberable.memoize("#{color}_king", position: king.current_position)
+        king.current_position 
+      end
   end
 end
