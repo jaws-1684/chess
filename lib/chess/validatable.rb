@@ -1,7 +1,7 @@
 module Chess
 	module Validatable
 		def path_clear? current_position, destination_position
-			return true if select_square(current_position).is_a?(Knight)
+			return true if select_square(current_position)&.name == :knight
 			unpack(current_position) do |px, py|
 				unpack(destination_position) do |dx, dy|
 		      x_step = dx <=> px
