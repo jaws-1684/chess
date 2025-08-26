@@ -126,9 +126,11 @@ module Chess
         rememberable[:enpassant_pawn] && rememberable[:enpassant_pawn][:color] != current_player_color
       end
       def find_current_king
-        king = pieces.select { |piece| piece.color == color && piece.is_a?(King) }.first
-        rememberable.memoize("#{color}_king", position: king.current_position)
-        king.current_position 
+        king = pieces.select { |piece| piece&.color == color && piece&.name == :king }.first
+        if king
+          rememberable.memoize("#{color}_king", position: king.current_position)
+          return king.current_position
+        end 
       end
   end
 end
