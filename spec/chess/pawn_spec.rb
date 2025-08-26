@@ -1,17 +1,21 @@
-require 'chess/board'
-require 'chess/piece'
-require "colorize"
+require "chess/piece"
+require "chess/board"
+require 'chess/pieces/pawn'
 
 module Chess
 	describe Pawn do
-		let(:board) { Board.new }
+		subject(:board) { Board.new(chess_set: false) }
+	
 		before do
 			$stdout = StringIO.new
-			board.current_player_color = :white
 		end
 
 		context "when white" do
-			subject(:pawn) { board[1, 1] }
+			subject(:pawn) { described_class.new(:white, [1,1], board)}
+			before do
+				board.add_to_cell([1,1], pawn)
+				board.current_player_color = :white
+			end
 
 			it "can step" do
 				subject.destination_position = [2, 1]
@@ -95,8 +99,9 @@ module Chess
 		end
 
 		context "when black" do
-		  subject(:pawn) { board[6, 1] }
+		  subject(:pawn) { described_class.new(:black, [6,1], board) }
 		  before do
+		  	board.add_to_cell([6,1], pawn)
 				board.current_player_color = :black
 			end
 		  
@@ -124,7 +129,7 @@ module Chess
 		    expect(subject.valid_move?).to eq true
 		  end
 		  it "cannot double step if the path is not clear" do
-		  	enemy = described_class.new(:black, [5, 1], board)
+		  	enemy = described_class.new(:white, [5, 1], board)
 				board.add_to_cell([5, 1], enemy)
 				subject.destination_position = [4, 1]
 				expect(subject.valid_move?).to eq false
