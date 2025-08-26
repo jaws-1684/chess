@@ -1,11 +1,12 @@
 require "chess/piece"
 require "chess/board"
 require 'chess/pieces/bishop'
+require "chess/pieces/king"
 
 module Chess
 	describe Bishop do
 		subject(:board) { Board.new(chess_set: false) }
-		subject(:bishop) { described_class.new(:white, [4,4], board)}
+		subject(:bishop) { described_class.new(:white, [4,4], board) }
 
 		before do
 			board.add_to_cell([4,4], bishop)
@@ -32,6 +33,12 @@ module Chess
 				board.add_to_cell([5,5], Bishop.new(:black, [5, 5], board))
 				bishop.destination_position = [5, 5]
 				expect(subject.valid_move?).to be_truthy
+			end
+			it "doesnt leave king in check" do
+				board.add_to_cell([3,6], King.new(:white, [3, 6], board))
+				board.add_to_cell([5,4], Bishop.new(:black, [5, 4], board))
+				bishop.destination_position = [5, 5]
+				expect(subject.safe_move?).to be_falsey
 			end
 
 		end
