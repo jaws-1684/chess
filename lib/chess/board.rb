@@ -15,11 +15,10 @@ module Chess
     def initialize memo=Rememberable.new, data=Array.new(8) { Array.new(8) { nil } }, chess_set:true
       @grid = data
       populate_board if chess_set
-
+      @squares_under_attack = {}
       @captured_pieces = []
       @moves = []
       @rememberable = memo
-      @squares_under_attack = []
     end
     
     def update! piece, last_position, destination_position
@@ -29,6 +28,23 @@ module Chess
       #removing the marked enpassant square from the board in the next opponent move regardless is its attacked or not
       #also ensuring that the enpassant_vulnerable flag is reset
       handle_enpassant! if enpassant_pawn_exists?
+    end
+    def square_under_attack? square
+      squares_under_attack.dig(square, :status) || false
+    end
+
+    def mark_squares_under_attack!
+     @squares_under_attack = {} 
+     enemies.each do |piece|
+        piece.valid_moves.each do |move|
+          @squares_under_attack[move] = { 
+            status: true
+            # attacker: piece.name,
+            # color: piece.color,
+            # position: piece.current_position,
+          } 
+        end
+      end
     end
     def select_square position
       unpack(position) { |x, y| self[x, y] }
@@ -52,13 +68,7 @@ module Chess
     def king_position
       rememberable.dig("#{color}_king", :position) || find_current_king
     end
-    def mark_squares_under_attack!
-      0.upto(7) do |i|
-        0.upto(7) do |j|
-          @squares_under_attack << [i, j] if enemies.any? { |enemy| enemy.can_attack?([i, j]) }
-        end
-      end
-    end
+
     def to_marshal
       {
         grid: @grid,
@@ -88,6 +98,7 @@ module Chess
     def dup
       Marshal.load(Marshal.dump(self))
     end
+
 
     private
       include Unpackable

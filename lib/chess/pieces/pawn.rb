@@ -1,3 +1,4 @@
+require "colorize"
 module Chess
   module Enpassant
     def enpassant_vulnerable_move?

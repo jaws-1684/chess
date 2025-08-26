@@ -73,8 +73,21 @@ module Chess
       board.update!(self, last_position, current_position)
       @destination_position = nil
     end
+    def valid_moves
+      possible_moves.reject { |position| !board.valid_position?(position) }.select(&valid)
+    end
+    def safe_moves
+      valid_moves.each_with_object([]) do |position, a|
+        cloned_board do |board|
+          piece = board.select_square(self.current_position)
+          piece.destination_position = position
+          piece.basic_move(board)
+          a << position unless board.in_check?
+        end
+      end
+    end
 
-    # private
+    private
       include Coordinates
       include Unpackable
 
@@ -84,28 +97,9 @@ module Chess
       def cloned_board &block
         yield(board.dup) if block_given?
       end
-      def valid_moves
-        possible_moves.reject { |position| !board.valid_position?(position) }.select(&valid)
-      end
-      def safe_moves 
-        valid_moves.each_with_object([]) do |position, a|
-          cloned_board do |board|
-            piece = board.select_square(self.current_position)
-            piece.destination_position = position
-            piece.basic_move(board)
-            a << position unless board.in_check?
-          end
-        end
-      end
+      
       def valid
         proc { |position| !piece(position)&.friendly?(self) && board.path_clear?(self.current_position, position) }
       end
   end
 end
-
-require_relative "pieces/bishop"
-require_relative "pieces/king"
-require_relative "pieces/knight"
-require_relative "pieces/pawn"
-require_relative "pieces/queen"
-require_relative "pieces/rook"

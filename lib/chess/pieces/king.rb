@@ -24,9 +24,9 @@ module Chess
       }
       case type
         when :kingside
-           !board.squares_under_attack.include?(squares[:right])
+           !board.square_under_attack?(squares[:right])
         when :queenside
-           !board.squares_under_attack.include?(squares[:left])
+           !board.square_under_attack?(squares[:left])
       end      
     end
 
@@ -40,6 +40,8 @@ module Chess
       (destination_position == kingside_castle) || (destination_position == queenside_castle)
     end
     def valid_castle? type
+      #returns false if king is under attack
+      return false if board.square_under_attack?(current_position) 
       !self.has_moved? && (rook(type) != nil) && !rook(type).has_moved? && safe_adjacent_square?(type)
     end
     def castle!

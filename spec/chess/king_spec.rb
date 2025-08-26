@@ -41,7 +41,7 @@ module Chess
 				king.destination_position = [2, 2]
 				expect(king.valid_move?).to be_falsey
 			end
-			#i am not testing in another tests(directly) that a piece cannot leave its king in check
+			#altought i am testing in some another test(bishop test specifically) that a piece cannot leave its king in check
 			#this should suffice since all pieces use the same method
 			it "should not move into check" do
 				rook = Rook.new(:black, [7, 3], board)

@@ -65,6 +65,7 @@ module Chess
 				subject.destination_position = [2, 1]
 				expect(subject.valid_move?).to eq false
 			end
+
 			context "when enpassant" do
 				let(:enemy) { described_class.new(:black, [3, 0], board) }
 				before do
@@ -94,8 +95,7 @@ module Chess
 					enemy.move!
 					expect(subject.enpassant_vulnerable?).to be_falsey
 				end
-			end  
-			
+			end
 		end
 
 		context "when black" do

@@ -1,7 +1,4 @@
-require 'chess/validatable'
-require 'chess/board'
-require 'chess/piece'
-require "colorize"
+require 'chess/game'
 
 module Chess
 	describe Board do
@@ -31,7 +28,6 @@ module Chess
 					subject(:board) { described_class.new(chess_set: false) }
 					before do
 						board.add_to_cell([7, 0], King.new(:black, [7, 0], board))
-						puts "memo: #{board.rememberable.data}"
 						enemy = Rook.new(:white, [7, 6], board)
 						board.add_to_cell([7, 6], enemy)
 
