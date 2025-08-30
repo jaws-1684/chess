@@ -1,7 +1,57 @@
 #!/usr/bin/env ruby
 require_relative "../lib/chess/game"
+require_relative "../lib/chess/computer/computer"
+require "colorize"
+require "artii" 
 
-#add players
-#create the gameflow
-#add ai
-Chess::Game.new.play
+def name_prompt message
+	print "Enter #{message} player's name:\s".colorize(:green)
+	_name = gets.chomp.downcase
+end
+def color_prompt
+	print "Enter first player's color [ white or black (w/b) ]!:\s".colorize(:green)
+	color = gets.chomp.downcase.to_sym
+	return color if [:white, :black].include?(color)
+	case color
+		when :b then :black
+		when :w then :white
+		else 
+			puts "Thats not a valid color try again! choose from [white or black]"
+			color_prompt
+	end
+end
+def switch_colors player
+	player.color == :white ? :black : :white 
+end
+
+def game &block
+	a = Artii::Base.new
+	puts "Welcome to chess. Press Ctrl+C to exit".colorize(:red)
+	puts a.asciify('Chess')
+	puts "\tDeveloped by: jaws".colorize(:blue)
+  puts "\tGitHub: github.com/jaws-1684".colorize(:blue)
+  puts "\tVersion: 1.1\n".colorize(:blue)
+  puts "[Type 'save' to save the game, 'exit' to quit]"
+
+	yield if block_given?
+	rescue Interrupt
+end
+
+Player = Struct.new(:name, :color)
+
+game do
+	first_player = Player.new(name_prompt(:first), color_prompt)
+
+	print "Do you wanna play with the computer?(y/n):\s".colorize(:red)
+	answer = gets.chomp.downcase.to_sym
+	if answer == :y
+		second_player = Chess::Computer.new(switch_colors(first_player))
+	else
+		second_player = Player.new(name_prompt(:second), switch_colors(first_player)) 	
+	end
+	#clearing the screen
+  puts "\e[H\e[2J"
+
+	Chess::Game.new(first_player, second_player).play
+end
+

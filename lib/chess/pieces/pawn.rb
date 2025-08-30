@@ -1,4 +1,3 @@
-require "colorize"
 module Chess
   module Enpassant
     def enpassant_vulnerable_move?
@@ -28,22 +27,34 @@ module Chess
     def final_row?
       color == :black ? px == 0 : px == 7
     end
+    def promoting_pieces
+      [
+        Queen.new(self.color, [px, py], self.board), 
+        Bishop.new(self.color, [px, py], self.board), 
+        Knight.new(self.color, [px, py], self.board), 
+        Rook.new(self.color, [px, py], self.board)
+      ]
+    end
     def promote!
       puts "Select a piece you want (Q/B/K/R):\s".colorize(:green)
       choice = gets.chomp.downcase.to_sym
       piece = case choice
-        when :q then Queen.new(self.color, [px, py], self.board)
-        when :b then Bishop.new(self.color, [px, py], self.board)
-        when :k then Knight.new(self.color, [px, py], self.board)
-        when :r then Rook.new(self.color, [px, py], self.board)
-        else Queen.new(self.color, [px, py], self.board)
+        when :q then promoting_pieces[0]
+        when :b then promoting_pieces[1]
+        when :k then promoting_pieces[2]
+        when :r then promoting_pieces[3]
+        else promoting_pieces[0]
       end
       board.update!(piece, last_position, current_position)
+    end
+    def auto_promote!
+      piece = promoting_pieces.sample
+      board.update!(piece, last_position, current_position)    
     end
   end
 
   class Pawn < Piece
-    attr_reader :name, :first_move, :direction
+    attr_reader :name, :first_move, :direction, :score
     attr_accessor :enpassant_vulnerable
     alias_method :enpassant_vulnerable?, :enpassant_vulnerable
     alias_method :first_move?, :first_move
@@ -54,6 +65,7 @@ module Chess
       @direction = (color == :white) ? 1 : -1
       @first_move = true
       @enpassant_vulnerable = false
+      @score = 1
     end
 
     def move!
@@ -67,11 +79,15 @@ module Chess
         if enpassant_capture?
           board.captured_pieces << enpassant_enemy
           destroy_enemy!
+          board.rememberable.destroy!(:enpassant_pawn)
         end
 
         @first_move = false 
       end
-      promote! if final_row?
+      if final_row?
+        promote! unless board.computer
+        auto_promote! if board.computer
+      end
     end
 
     private
@@ -83,4 +99,3 @@ module Chess
       end
   end
 end
-

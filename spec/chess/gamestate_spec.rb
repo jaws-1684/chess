@@ -10,14 +10,16 @@ module Chess
 				end
 				context "when king is in check" do
 					it "should be_truthy" do
-						board.add_to_cell([7, 7], Rook.new(:white, [7, 7], board)) 
+						board.add_to_cell([7, 7], Rook.new(:white, [7, 7], board))
+						board.set_squares_under_attack! 
 						expect(board.in_check?).to be_truthy
 					end
 				end
 
 				context "when king is not in_check" do
 					it  "should be_falsey" do
-						board.add_to_cell([6, 7], Rook.new(:white, [6, 7], board)) 
+						board.add_to_cell([6, 7], Rook.new(:white, [6, 7], board))
+						board.set_squares_under_attack!  
 						expect(board.in_check?).to be_falsey
 					end
 				end
@@ -37,6 +39,7 @@ module Chess
 						white_king = King.new(:white, [0, 1], board)
 						board.add_to_cell([0, 1], white_king)
 						board.current_player_color = :black
+							board.set_squares_under_attack! 
 					end
 					it  "should be_truthy" do
 						expect(board.in_checkmate?).to be_truthy
@@ -53,6 +56,7 @@ module Chess
 						board.add_to_cell([1, 6], enemy)
 						white_king = King.new(:white, [1, 5], board)
 						board.add_to_cell([1, 5], white_king)
+						board.set_squares_under_attack! 
 						expect(board.in_checkmate?).to be_truthy
 					end
 				end
@@ -67,6 +71,7 @@ module Chess
 						board.add_to_cell([7, 1], enemy)
 						white_king = King.new(:white, [5, 6], board)
 						board.add_to_cell([5, 6], white_king)
+						board.set_squares_under_attack! 
 						expect(board.in_checkmate?).to be_truthy
 					end
 				end
@@ -85,6 +90,7 @@ module Chess
 
 						second_bishop = Bishop.new(:white, [2, 4], board)
 						board.add_to_cell([2, 4], second_bishop)
+						board.set_squares_under_attack! 
 						expect(board.in_checkmate?).to be_truthy
 					end
 				end
@@ -104,6 +110,7 @@ module Chess
 
 						knight = Knight.new(:white, [5, 0], board)
 						board.add_to_cell([5, 0], knight)
+						board.set_squares_under_attack! 
 						expect(board.in_checkmate?).to be_truthy
 					end
 				end
@@ -118,6 +125,7 @@ module Chess
 						board.add_to_cell([7, 7], enemy)
 						ally = Rook.new(:black, [7, 5], board)
 						board.add_to_cell([7,5], ally)
+						board.set_squares_under_attack! 
 						expect(board.in_checkmate?).to be_falsey
 					end
 				end
@@ -137,6 +145,7 @@ module Chess
 
 						king = King.new(:white, [3, 2], board)
 						board.add_to_cell([3, 2], king)
+						board.set_squares_under_attack! 
 						expect(subject.in_stalemate?).to be_truthy
 					end
 				end

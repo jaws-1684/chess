@@ -1,5 +1,4 @@
 require_relative "actionable"
-require_relative "unpackable"
 
 module Chess
   module Coordinates
@@ -20,7 +19,7 @@ module Chess
   end
   
   class Piece
-    attr_reader :color, :current_position, :last_position, :board, :symbol
+    attr_reader :color, :current_position, :last_position, :board, :symbol, :score
     attr_accessor :destination_position
 
     def initialize color, current_position, board
@@ -32,12 +31,10 @@ module Chess
 
     def move!
       raise "Destination position is missing!" unless destination_position
-      raise "Not a valid #{self.name} move!" unless valid_move?
-      raise "Path is not clear!" unless board.path_clear?(current_position, destination_position)
       raise "You cannot move over your own #{piece.name}!" if piece&.friendly?(self)
+      raise "Path is not clear!" unless board.path_clear?(current_position, destination_position)
+      raise "Not a valid #{self.name} move!" unless valid_move?
       raise "You cannot place you own king into check!" unless safe_move?
-
-      puts "Moving to #{destination_position}."
     end
     def valid_move?
       valid_moves.include?(destination_position)
@@ -52,7 +49,7 @@ module Chess
       other_piece&.color != self.color
     end
     def piece square=destination_position
-      unpack(square) { |dx, dy| board[dx, dy] }
+      board.select_square(square)
     end
     def enemy
       piece if piece&.enemy?(self)
@@ -73,23 +70,35 @@ module Chess
       board.update!(self, last_position, current_position)
       @destination_position = nil
     end
-    def valid_moves
-      possible_moves.reject { |position| !board.valid_position?(position) }.select(&valid)
+    def valid_moves &block
+      valid_moves = possible_moves.reject { |position| !board.valid_position?(position) }.select(&valid)
+      valid_moves.select! { |pmove| yield(pmove) } if block_given?
+      valid_moves
     end
-    def safe_moves
+    def safe_moves &block
       valid_moves.each_with_object([]) do |position, a|
         cloned_board do |board|
           piece = board.select_square(self.current_position)
           piece.destination_position = position
           piece.basic_move(board)
+          board.set_squares_under_attack!
+      
           a << position unless board.in_check?
+          #the block is needed for the computer object to select safe_squares fo any given pieces no just the king 
+          yield(board, position) if block_given? 
         end
       end
+    end
+    def <=> other
+      #sorting from lowest to highest
+      self.score <=> other.score
+    end
+    def > other
+      self.score > other.score
     end
 
     private
       include Coordinates
-      include Unpackable
 
       def assign_symbol
         raise NotImplementedError, "Subclasses must implement the assign_symbol method"
@@ -99,7 +108,7 @@ module Chess
       end
       
       def valid
-        proc { |position| !piece(position)&.friendly?(self) && board.path_clear?(self.current_position, position) }
+        proc { |position| position != current_position && !piece(position)&.friendly?(self) && board.path_clear?(self.current_position, position) }
       end
   end
 end

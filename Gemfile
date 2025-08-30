@@ -11,3 +11,5 @@ gem "rubocop", "~> 1.79"
 gem "pry-byebug", "~> 3.11"
 
 gem "colorize", "~> 1.1"
+
+gem "artii", "~> 2.1"

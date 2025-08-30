@@ -1,10 +1,11 @@
 module Chess
   class Queen < Piece
-    attr_reader :name
+    attr_reader :name, :score
 
     def initialize color, current_position, board
       super(color, current_position, board)
       @name = :queen
+      @score = 9
     end
     def move!
       super

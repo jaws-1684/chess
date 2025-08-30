@@ -103,7 +103,7 @@ module Chess
 				rook = Rook.new(:white, [0, 7], board)
 				board.add_to_cell([0, 7], rook)
 
-				board.mark_squares_under_attack!
+				board.set_squares_under_attack!
 				king.destination_position = [0, 6]
 				expect(king.safe_move?).to be_falsey
 			end
@@ -114,7 +114,7 @@ module Chess
 				rook = Rook.new(:white, [0, 0], board)
 				board.add_to_cell([0, 0], rook)
 
-				board.mark_squares_under_attack!
+				board.set_squares_under_attack!
 				king.destination_position = [0, 2]
 				expect(king.safe_move?).to be_falsey
 			end
@@ -125,7 +125,7 @@ module Chess
 				rook = Rook.new(:white, [0, 7], board)
 				board.add_to_cell([0, 7], rook)
 
-				board.mark_squares_under_attack!
+				board.set_squares_under_attack!
 				king.destination_position = [0, 6]
 				expect(king.safe_move?).to be_falsey
 			end
@@ -134,7 +134,7 @@ module Chess
 				board.add_to_cell([7, 3], enemy)
 				rook = Rook.new(:white, [0, 0], board)
 				board.add_to_cell([0, 0], rook)
-				board.mark_squares_under_attack!
+				board.set_squares_under_attack!
 
 				king.destination_position = [0, 2]
 				expect(king.safe_move?).to be_falsey

@@ -1,6 +1,6 @@
 module Chess
   module Displayable
-    def render grid
+    def self.render grid
       puts ""
       headers  
       delimiters("+")
@@ -18,19 +18,20 @@ module Chess
       headers
       puts ""
     end
-    def headers
-      puts "\t\s\s\s| a | b | c | d | e | f | g | h |".colorize(:light_blue)
-    end
-    def delimiters symbol
-      puts "\t".ljust(40, "#{symbol}\s").colorize(:gray)
-    end
+    private
+      def self.headers
+        puts "\t\s\s\s| a | b | c | d | e | f | g | h |".colorize(:light_blue)
+      end
+      def self.delimiters symbol
+        puts "\t".ljust(40, "#{symbol}\s").colorize(:gray)
+      end
 
-    def format_line stdout_row, row_index
-      index = row_index.to_s.colorize(:light_blue) 
-      col_delimiter = "|".center(3, "\s").colorize(:gray)
-      data = stdout_row.join(col_delimiter)
-      output = [index, data, index].join("\s|\s")
-      puts "\t\s#{output}" 
+      def self.format_line stdout_row, row_index
+        index = row_index.to_s.colorize(:light_blue) 
+        col_delimiter = "|".center(3, "\s").colorize(:gray)
+        data = stdout_row.join(col_delimiter)
+        output = [index, data, index].join("\s|\s")
+        puts "\t\s#{output}" 
+      end
     end
-  end
 end

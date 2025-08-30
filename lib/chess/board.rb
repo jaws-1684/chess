@@ -1,17 +1,19 @@
 require_relative "./gamestate/gamestate"
-require_relative "validatable"
-require_relative "unpackable"
+require_relative "utilities"
 require_relative "rememberable"
+require_relative "algebraic_notation"
 
 module Chess
   class Board
     include Gamestate::Check
     include Gamestate::Checkmate
-    include Validatable
+    include Utilities::Validatable
+    using AlgebraicRefinements
     attr_reader :grid, :rememberable, :squares_under_attack
-    attr_accessor :captured_pieces, :current_player_color
+    attr_accessor :captured_pieces, :current_player_color, :computer
     alias_method :color, :current_player_color
     
+
     def initialize memo=Rememberable.new, data=Array.new(8) { Array.new(8) { nil } }, chess_set:true
       @grid = data
       populate_board if chess_set
@@ -19,30 +21,41 @@ module Chess
       @captured_pieces = []
       @moves = []
       @rememberable = memo
+      @computer = false
     end
     
     def update! piece, last_position, destination_position
       add_to_cell(destination_position, piece)
       clear_cell(last_position)
       @moves << destination_position
-      #removing the marked enpassant square from the board in the next opponent move regardless is its attacked or not
+      #removing the marked enpassant square from the board in the next opponent move regardless is its attacked by a pawn or not
+      #when the opponent is remove by a pawn this code wont run case the pawn was already removed from the board and the rememberable record deleted
       #also ensuring that the enpassant_vulnerable flag is reset
       handle_enpassant! if enpassant_pawn_exists?
+      set_squares_under_attack!(update: true)
     end
     def square_under_attack? square
       squares_under_attack.dig(square, :status) || false
     end
 
-    def mark_squares_under_attack!
+    def set_squares_under_attack! update: false
+     pieces = update ?  players_pieces : enemies
+
      @squares_under_attack = {} 
-     enemies.each do |piece|
+     pieces.each do |piece|
+      if piece.name == :pawn
+        pawn_attack_vectors = piece.possible_moves[2..3].select {|pos| valid_position?(pos) }
+        if pawn_attack_vectors.any?
+          pawn_attack_vectors.each {|v|  @squares_under_attack[v] = { status: true, attacker: piece.name, apos: piece.current_position } }
+        end
+        next      
+      end
         piece.valid_moves.each do |move|
           @squares_under_attack[move] = { 
-            status: true
-            # attacker: piece.name,
-            # color: piece.color,
-            # position: piece.current_position,
-          } 
+            status: true,
+            attacker: piece.name,
+            apos: piece.current_position
+          }
         end
       end
     end
@@ -50,8 +63,8 @@ module Chess
       unpack(position) { |x, y| self[x, y] }
     end
     def get_piece position
-      raise "Invalid position: #{position}" unless valid_position?(position)
-      raise "Invalid selection: #{position}. You cannot select an empty square!" if clear_destination?(position)
+      raise "Invalid position: #{position.to_algebraic}" unless valid_position?(position)
+      raise "Invalid selection: #{position.to_algebraic}. You cannot select an empty square!" if clear_destination?(position)
       piece = select_square(position)
       raise "You can select only #{color} pieces!" unless piece.color == color 
       piece
@@ -99,9 +112,8 @@ module Chess
       Marshal.load(Marshal.dump(self))
     end
 
-
     private
-      include Unpackable
+      include Utilities::Unpackable
       def populate_board
         @grid[0] = [
           Rook.new(:white, [0, 0], self),
@@ -113,6 +125,7 @@ module Chess
           Knight.new(:white, [0, 6], self),
           Rook.new(:white,   [0, 7], self)
         ]
+       
         @grid[1] = Array.new(8) { |i| Pawn.new(:white, [1, i], self) }
         @grid[7] = [
           Rook.new(:black,   [7, 0], self),
@@ -124,13 +137,14 @@ module Chess
           Knight.new(:black, [7, 6], self),
           Rook.new(:black,   [7, 7], self)
         ]
-        @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
+         @grid[1] = Array.new(8) { |i| Pawn.new(:black, [1, i], self) }
       end
       def handle_enpassant!
         pawn_position = rememberable.dig(:enpassant_pawn, :current_square)
-        pawn = select_square(pawn_position)
-
-        pawn.enpassant_vulnerable = false if pawn
+        piece = select_square(pawn_position)
+        #this line may be rendundant but its here if something goes wrong
+        #it should be a pawn at this position if its not attacked
+        piece.enpassant_vulnerable = false if piece&.name == :pawn
         rememberable.destroy!(:enpassant_pawn)
       end
       def enpassant_pawn_exists?

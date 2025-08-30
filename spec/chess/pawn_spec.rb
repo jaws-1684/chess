@@ -1,7 +1,7 @@
 require "chess/piece"
 require "chess/board"
 require 'chess/pieces/pawn'
-
+require "colorize"
 module Chess
 	describe Pawn do
 		subject(:board) { Board.new(chess_set: false) }

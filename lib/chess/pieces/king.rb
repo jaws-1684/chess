@@ -16,17 +16,13 @@ module Chess
     end
 
     def safe_adjacent_square? type
-      #checking only the px+1 right and px-1 left squares cause the destination position is checked in the superclass and 
+      #checking only the py+1 right and py-1 left squares cause the destination position is checked in the superclass and 
       #the rook itself checks if its putting the king in check
-      squares = {
-        left: [px, py-1],
-        right: [px, py+1]
-      }
       case type
         when :kingside
-           !board.square_under_attack?(squares[:right])
+           !board.square_under_attack?([px, py+1])
         when :queenside
-           !board.square_under_attack?(squares[:left])
+           !board.square_under_attack?([px, py-1])
       end      
     end
 
@@ -56,13 +52,14 @@ module Chess
   end
 
   class King < Piece
-    attr_reader :name, :has_moved 
+    attr_reader :name, :has_moved, :score
     alias_method :has_moved?, :has_moved
 
     def initialize color, current_position, board
       super(color, current_position, board)
       @name = :king
       @has_moved = false
+      @score = 999
     end
     def move!
       super

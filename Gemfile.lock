@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    artii (2.1.2)
     ast (2.4.3)
     byebug (12.0.0)
     coderay (1.1.3)
@@ -61,6 +62,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  artii (~> 2.1)
   colorize (~> 1.1)
   pry-byebug (~> 3.11)
   rspec (~> 3.13)
