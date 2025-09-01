@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require_relative "../lib/chess/db"
 require_relative "../lib/chess/game"
 require_relative "../lib/chess/computer/computer"
 require "colorize"
@@ -32,8 +33,18 @@ def game &block
   puts "\tGitHub: github.com/jaws-1684".colorize(:blue)
   puts "\tVersion: 1.1\n".colorize(:blue)
   puts "[Type 'save' to save the game, 'exit' to quit]"
+  puts "Options:"
+	puts "  1. Start a new game"
+	puts "  2. Load saved game"
+	choice = gets.chomp
 
-	yield if block_given?
+	if choice == '2' && Chess::Db.saved_games?
+		game = Chess::Game.load_saved_game(Chess::Db.saved_files)
+		game.play
+	else
+		puts "Starting a new game..."
+		yield if block_given?
+	end
 	rescue Interrupt
 end
 

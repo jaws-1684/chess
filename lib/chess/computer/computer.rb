@@ -6,21 +6,20 @@ module Chess
 			@color = color
 			@selected_position = nil 
 			@selected_piece = nil
-			["moves_buffer","attacks_buffer","best_move_buffer", "best_attack_buffer"].each {|v| instance_variable_set("@#{v}", Hash.new) }
+			["moves_buffer","best_move_buffer", "best_attack_buffer"].each {|v| instance_variable_set("@#{v}", Hash.new) }
 		end
 		def set_board=(board)
 			@board = board
 		end
 		def select_piece!
 			search_piece!
-			return attack(@best_attack_buffer) if @best_attack_buffer&.any?
-			return move(@best_move_buffer) unless @best_move_buffer.values.flatten.empty?
-			return move(@attacks_buffer) unless @attacks_buffer.values.flatten.empty?
+			return move(@best_attack_buffer) if @best_attack_buffer&.any?
+			return move(@best_move_buffer) if @best_move_buffer.values.flatten&.any?
 			move(@moves_buffer)
 		end
 		private
 			def search_piece!
-				buffers = [@attacks_buffer, @moves_buffer, @best_move_buffer, @best_attack_buffer]
+				buffers = [@moves_buffer, @best_move_buffer, @best_attack_buffer]
 				buffers.each { |b| b.clear }
 
 				board.players_pieces.each do |piece|
@@ -28,23 +27,23 @@ module Chess
 					safe_moves = []
 					best_moves = []
 	
-					piece.safe_moves do |board, position|
+					piece.safe_moves do |cboard, position|
 						next if board.in_check?  
-						if !board.square_under_attack?(position) || sacrifice_worth?(piece, position)	
+						if !cboard.square_under_attack?(position) || sacrifice_worth?(piece, position)
+							#moves that wont put another pieces in danger
+							if cboard.players_pieces.reject { |p| p == piece }.none? {|ally| cboard.square_under_attack?(ally.current_position) }
+								best_moves << position
+							end	
 							safe_moves << position
 						end
-
-						board.players_pieces.reject { |p| p == piece }.each do |ally|
-							best_moves << position unless board.square_under_attack?(ally.current_position)
-						end	
 					end
 					next if safe_moves.empty?
 
+					#getting the most valueable reacheable enemy at enemies[0]
 					enemies = safe_moves.select { |pos| board.is_a_piece?(pos) }.map {|pos| board.select_square(pos) }.sort.reverse
-					puts enemies.map(&:current_position)
 				
-					if enemies.any?
-					#most valuebale enemy
+					unless enemies.empty?
+						#most valuebale enemy
 						mvenemy_position = enemies.first.current_position
 						if @best_attack_buffer.empty?
 							@best_attack_buffer[piece_position] = mvenemy_position
@@ -55,35 +54,31 @@ module Chess
 							@best_attack_buffer[piece_position] = mvenemy_position
 						end
 					end
-					enemies_pos = enemies.map(&:current_position)
-					unless best_moves.compact.empty?
-						best_moves = sort_moves(best_moves.compact)
+
+					unless best_moves.empty?
+						best_moves = sort_moves(best_moves.compact).first
 					end
-					safe_moves = sort_moves(safe_moves.compact)
+					safe_moves = sort_moves(safe_moves.compact).first
 				
-					set_moves(piece_position, moves: safe_moves, enemies_pos: enemies_pos, best_moves: best_moves)
+					set_moves(piece_position, moves: safe_moves, best_moves: best_moves)
 				end
-				
 				#sanitazing the output a bit
 				buffers.each { |b| b.reject! {|_, v| v.empty? } }
 			end
 
 			def move dictionary
 				# piece_position = dictionary.keys.sample
+				#selecting the least valueble piece to move
 				sorted_hash = Hash[ dictionary.sort_by { |key, val| board.select_square(key) } ]
 				piece_position = sorted_hash.keys[0]
 				@selected_piece = board.select_square(piece_position)
-				@selected_position = dictionary[piece_position][0]
+				@selected_position =  sorted_hash[piece_position]
 			end
 			def set_moves position, **args
 				@moves_buffer[position] = args[:moves]
-				@attacks_buffer[position] = args[:enemies_pos]
 				@best_move_buffer[position] = args[:best_moves]
 			end
-			def attack dictionary
-				@selected_piece = board.select_square(dictionary.keys[0])
-				@selected_position = dictionary.values[0]
-			end
+
 			def sort_moves moves
 				case board.current_player_color
 					when :white 

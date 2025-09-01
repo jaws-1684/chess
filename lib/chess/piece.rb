@@ -77,15 +77,15 @@ module Chess
     end
     def safe_moves &block
       valid_moves.each_with_object([]) do |position, a|
-        cloned_board do |board|
-          piece = board.select_square(self.current_position)
-          piece.destination_position = position
-          piece.basic_move(board)
-          board.set_squares_under_attack!
+        cloned_board do |cboard|
+          cpiece = cboard.select_square(self.current_position)
+          cpiece.destination_position = position
+          cpiece.basic_move(cboard)
+          cboard.set_squares_under_attack!
       
-          a << position unless board.in_check?
+          a << position unless cboard.in_check?
           #the block is needed for the computer object to select safe_squares fo any given pieces no just the king 
-          yield(board, position) if block_given? 
+          yield(cboard, position) if block_given? 
         end
       end
     end

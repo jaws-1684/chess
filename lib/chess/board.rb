@@ -137,7 +137,7 @@ module Chess
           Knight.new(:black, [7, 6], self),
           Rook.new(:black,   [7, 7], self)
         ]
-         @grid[1] = Array.new(8) { |i| Pawn.new(:black, [1, i], self) }
+         @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
       end
       def handle_enpassant!
         pawn_position = rememberable.dig(:enpassant_pawn, :current_square)

@@ -7,7 +7,6 @@ require_relative "pieces/queen"
 require_relative "pieces/rook"
 require_relative "board"
 require_relative "displayable"
-require_relative "computer/computer"
 require_relative "algebraic_notation"
 require "pry-byebug"
 
@@ -15,6 +14,8 @@ require "pry-byebug"
 module Chess
 	class Game
     using AlgebraicRefinements
+    extend Db::Load
+    include Db::Save
   	attr_reader :board, :current_player
     
     def initialize player1, player2, chess_board=Board.new
@@ -29,7 +30,7 @@ module Chess
     def play
     	loop do
         begin
-          game_messages.each { |m| puts m }
+          puts game_messages
 
           if board.in_checkmate?
             puts "Checkmate #{current_player.name}-#{current_player.color} lost!"
@@ -49,7 +50,6 @@ module Chess
             current_player.select_piece!
             piece = current_player.selected_piece
             position = current_player.selected_position
-            puts "#{piece.name} position #{position}"
           else
             board.computer = false 
             square = get_player_input("Select a piece:\s")
@@ -67,7 +67,7 @@ module Chess
         end  
    		end
     rescue Interrupt
-      puts "byebye"
+      handle_exit
     end
 
     private
@@ -95,17 +95,31 @@ module Chess
             puts "Enter filename (or press Enter for default 'saved_game.dat'):"
             filename = gets.chomp
             filename = 'chess.dat' if filename.empty?
-            
-            #add save_game functioanlity
-            # save_game(filename)
             next  # Ask for input again after saving
           elsif input == "exit"
-            puts "byebye".colorize(:red)
+            handle_exit
             exit
           end
           return input.split("").convert_to_index
         end
       end
+      def handle_exit
+        puts "\nDo you want to save the game before exiting? (y/n)"
+        answer = gets.chomp.downcase
+        
+        if answer == 'y'
+          puts "Enter filename (or press Enter for default 'chess.dat'):"
+          filename = gets.chomp
+          if save_file!(filename)
+            puts "Game saved. Goodbye!"
+          else
+            puts "Save failed. Exiting without saving."
+          end
+        else
+          puts "Exiting without saving. Goodbye!"
+        end
+      end
+
 
   end
 end
