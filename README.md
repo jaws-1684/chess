@@ -1,10 +1,11 @@
 ![Ruby](https://img.shields.io/badge/ruby-%23CC342D.svg?style=for-the-badge&logo=ruby&logoColor=white)
- 
+
 # Chess
 
-A basic command line ruby chess game where two players can play against each other or against computer.
-This chess engine supports move generation/validation, piece placement/movement, and check/checkmate/stalemate detection. 
+A basic command line ruby chess game where two players can play against each other or against a simple computer.
+This chess engine supports move generation/validation, piece placement/movement, and check/checkmate/stalemate detection.[^1]
 
+[^1]: This is the final project in the Ruby curriculum at The Odin Project. 
 ## Structure
 
 ```
