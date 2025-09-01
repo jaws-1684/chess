@@ -4,7 +4,7 @@
 
 A basic command line ruby chess game where two players can play against each other or against a **simple computer**.
 
-[!NOTE]
+>[!NOTE]
 > This is the final project in the Ruby curriculum at The Odin Project.
 
 ## Description
@@ -72,11 +72,8 @@ Run the following command to install this game as a ruby gem:
 ```
 Then run the game from your terminal with `chess`.
 
-[!TIP]
-> If installing the gem is not an option, after cloning the repository, first install the dependecies:
-	```sh
-		bundle install 
-	```
+>[!TIP]
+> If installing the gem is not an option, after cloning the repository, first install the dependecies: `bundle install`
 And run the game with `bin/chess`.
 
 
