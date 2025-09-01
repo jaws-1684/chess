@@ -56,7 +56,7 @@ Run the following command to install this game as a ruby gem:
 ```sh
 	gem install chess-1.1.0.gem
 ```
-Run game the from your terminal with `chess`.\n
+Run game the from your terminal with `chess`.
 
 If installing the gem is not an option, after cloning the repository first install the dependecies:
 ```sh
