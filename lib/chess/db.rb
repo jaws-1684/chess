@@ -35,7 +35,6 @@ module Chess
 				data = Marshal.load(file.read)
 
 				if data[:board].is_a?(Board)
-					self
 					board = data[:board]
 					player_1 = data[:player_1]
 					player_2 = data[:player_2]
