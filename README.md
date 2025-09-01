@@ -2,10 +2,19 @@
 
 # Chess
 
-A basic command line ruby chess game where two players can play against each other or against a simple computer.
-This chess engine supports move generation/validation, piece placement/movement, and check/checkmate/stalemate detection.[^1]
+A basic command line ruby chess game where two players can play against each other or against a ==simple computer==.
 
-[^1]: This is the final project in the Ruby curriculum at The Odin Project. 
+[^1]: This is the final project in the Ruby curriculum at The Odin Project.
+
+## Description
+This chess engine supports:
+	- move generation/validation
+	- piece placement/movement
+	- enpassant and promotion for pawns
+	- castling for king
+	- check/checkmate/stalemate detection
+	- saving the game
+
 ## Structure
 
 ```
