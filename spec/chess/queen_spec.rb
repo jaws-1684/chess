@@ -1,1 +1,3 @@
-#since queen inherits All slidable module its functionality its properly tested in Bishop and Rook specs already
+# frozen_string_literal: true
+
+# since queen inherits All slidable module its functionality its properly tested in Bishop and Rook specs already

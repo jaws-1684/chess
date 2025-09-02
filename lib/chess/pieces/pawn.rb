@@ -1,68 +1,79 @@
+# frozen_string_literal: true
+
 module Chess
   module Enpassant
     def enpassant_vulnerable_move?
       first_move? && destination_position == double_step
     end
+
     def adjacent_pieces
-      [piece([px, py+1]), piece([px, py-1])]
+      [piece([px, py + 1]), piece([px, py - 1])]
     end
+
     def valid_enpassant_attack?
-      adjacent_pieces.any? { |piece| piece.is_a?(Pawn) && piece&.enemy?(self) && piece&.enpassant_vulnerable? }
+      adjacent_pieces.any? { |piece| piece.is_a?(Pawn) && piece&.enemy?(self) && piece.enpassant_vulnerable? }
     end
+
     def enpassant_capture?
-      #checking the passed square
-      #if there is no enpassant pawn this will return false
+      # checking the passed square
+      # if there is no enpassant pawn this will return false
       destination_position == board.rememberable.dig(:enpassant_pawn, :passed_square)
     end
+
     def enpassant_enemy
-      #getting the actual enemy piece to be captured
+      # getting the actual enemy piece to be captured
       position = board.rememberable.dig(:enpassant_pawn, :current_square)
       piece(position)
     end
+
     def destroy_enemy!
       board.clear_cell(enpassant_enemy.current_position)
     end
   end
+
   module Promotion
     def final_row?
-      color == :black ? px == 0 : px == 7
+      px == (color == :black ? 0 : 7)
     end
+
     def promoting_pieces
       [
-        Queen.new(self.color, [px, py], self.board), 
-        Bishop.new(self.color, [px, py], self.board), 
-        Knight.new(self.color, [px, py], self.board), 
-        Rook.new(self.color, [px, py], self.board)
+        Queen.new(color, [px, py], board),
+        Bishop.new(color, [px, py], board),
+        Knight.new(color, [px, py], board),
+        Rook.new(color, [px, py], board)
       ]
     end
+
     def promote!
       puts "Select a piece you want (Q/B/K/R):\s".colorize(:green)
       choice = gets.chomp.downcase.to_sym
       piece = case choice
-        when :q then promoting_pieces[0]
-        when :b then promoting_pieces[1]
-        when :k then promoting_pieces[2]
-        when :r then promoting_pieces[3]
-        else promoting_pieces[0]
-      end
+              when :q then promoting_pieces[0]
+              when :b then promoting_pieces[1]
+              when :k then promoting_pieces[2]
+              when :r then promoting_pieces[3]
+              else promoting_pieces[0]
+              end
       board.update!(piece, last_position, current_position)
     end
+
     def auto_promote!
       piece = promoting_pieces.sample
-      board.update!(piece, last_position, current_position)    
+      board.update!(piece, last_position, current_position)
     end
   end
 
   class Pawn < Piece
     attr_reader :name, :first_move, :direction, :score
     attr_accessor :enpassant_vulnerable
-    alias_method :enpassant_vulnerable?, :enpassant_vulnerable
-    alias_method :first_move?, :first_move
+    alias enpassant_vulnerable? enpassant_vulnerable
+    alias first_move? first_move
 
-    def initialize color, current_position, board
+    def initialize(color, current_position, board)
       super(color, current_position, board)
       @name = :pawn
-      @direction = (color == :white) ? 1 : -1
+      @direction = color == :white ? 1 : -1
       @first_move = true
       @enpassant_vulnerable = false
       @score = 1
@@ -73,7 +84,8 @@ module Chess
       basic_move do
         if enpassant_vulnerable_move?
           @enpassant_vulnerable = true
-          board.rememberable.memoize(:enpassant_pawn, color: self.color, passed_square: [px+direction, py], current_square: destination_position)
+          board.rememberable.memoize(:enpassant_pawn, color: color, passed_square: [px + direction, py],
+                                                      current_square: destination_position)
         end
 
         if enpassant_capture?
@@ -82,20 +94,21 @@ module Chess
           board.rememberable.destroy!(:enpassant_pawn)
         end
 
-        @first_move = false 
+        @first_move = false
       end
-      if final_row?
-        promote! unless board.computer
-        auto_promote! if board.computer
-      end
+      return unless final_row?
+
+      promote! unless board.computer
+      auto_promote! if board.computer
     end
 
     private
-      include Actionable::Stepable
-      include Enpassant
-      include Promotion
-      def assign_symbol
-        color == :white ? "♙" : "♟"
-      end
+
+    include Actionable::Stepable
+    include Enpassant
+    include Promotion
+    def assign_symbol
+      color == :white ? '♙' : '♟'
+    end
   end
 end

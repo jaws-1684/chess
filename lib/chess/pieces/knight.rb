@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Chess
   class Knight < Piece
     attr_reader :name, :score
-    
-    def initialize color, current_position, board
+
+    def initialize(color, current_position, board)
       super(color, current_position, board)
       @name = :knight
       @score = 3
@@ -14,9 +16,10 @@ module Chess
     end
 
     private
-      include Actionable::Lshapable
-      def assign_symbol
-        color == :white ? "♘" : "♞"
-      end
+
+    include Actionable::Lshapable
+    def assign_symbol
+      color == :white ? '♘' : '♞'
+    end
   end
 end
