@@ -10,6 +10,7 @@ require_relative 'pieces/rook'
 require_relative 'board'
 require_relative 'displayable'
 require_relative 'algebraic_notation'
+require_relative 'db'
 require 'pry-byebug'
 
 module Chess
