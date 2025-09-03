@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 3.3.5'
   s.add_dependency 'artii', '~> 2.1'
   s.add_dependency 'colorize', '~> 1.1'
+  s.add_dependency "zeitwerk", "~> 2.7"
   s.add_development_dependency 'pry-byebug', '~> 3.11'
   s.add_development_dependency 'rspec', '~> 1.1', '>= 1.1.4'
   s.add_development_dependency 'rubocop', '~> 1.79'
