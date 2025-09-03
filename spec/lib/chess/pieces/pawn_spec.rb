@@ -1,10 +1,8 @@
 # frozen_string_literal: true
+require "spec_helper"
 
-require 'chess/piece'
-require 'chess/board'
-require 'chess/pieces/pawn'
-require 'colorize'
 module Chess
+  module Pieces
   describe Pawn do
     subject(:board) { Board.new(chess_set: false) }
 
@@ -194,4 +192,5 @@ module Chess
       end
     end
   end
+end
 end

@@ -1,28 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'actionable'
-
 module Chess
-  module Coordinates
-    # grab current position x and y
-    def px
-      @current_position[0]
-    end
-
-    def py
-      @current_position[1]
-    end
-
-    # grab destinaton position x and y
-    def dx
-      @destination_position[0]
-    end
-
-    def dy
-      @destination_position[1]
-    end
-  end
-
   class Piece
     attr_reader :color, :current_position, :last_position, :board, :symbol, :score
     attr_accessor :destination_position

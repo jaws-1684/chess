@@ -1,15 +1,11 @@
 # frozen_string_literal: true
 
-require_relative './gamestate/gamestate'
-require_relative 'utilities'
-require_relative 'rememberable'
-require_relative 'algebraic_notation'
 
 module Chess
   class Board
-    include Gamestate::Check
-    include Gamestate::Checkmate
-    include Utilities::Validatable
+    include Gamestate
+    include Utilities
+    include Pieces
     using AlgebraicRefinements
     attr_reader :grid, :rememberable, :squares_under_attack
     attr_accessor :captured_pieces, :current_player_color, :computer
@@ -131,8 +127,7 @@ module Chess
     end
 
     private
-
-    include Utilities::Unpackable
+    
     def populate_board
       @grid[0] = [
         Rook.new(:white, [0, 0], self),
@@ -156,7 +151,7 @@ module Chess
         Knight.new(:black, [7, 6], self),
         Rook.new(:black,   [7, 7], self)
       ]
-      @grid[6] = Array.new(8) { |i| Pawn.new(:black, [6, i], self) }
+      @grid[6] = Array.new(8) { |i| Pawn.new(:white, [6, i], self) }
     end
 
     def handle_enpassant!

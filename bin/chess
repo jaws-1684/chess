@@ -1,11 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative '../lib/chess/db'
-require_relative '../lib/chess/game'
-require_relative '../lib/chess/computer/computer'
-require 'colorize'
-require 'artii'
+require_relative '../lib/chess'
 
 def name_prompt(message)
   print "Enter #{message} player's name:\s".colorize(:green)
@@ -43,8 +39,8 @@ def game
   puts '  2. Load saved game'
   choice = gets.chomp
 
-  if choice == '2' && Chess::Db.saved_games?
-    game = Chess::Game.load_saved_game(Chess::Db.saved_files)
+  if choice == '2' && Chess::Game.saved_games?
+    game = Chess::Game.load_saved_game!(Chess::Game.saved_files)
     game.play
   else
     puts 'Starting a new game...'

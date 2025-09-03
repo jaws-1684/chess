@@ -4,6 +4,13 @@ require 'chess/game'
 
 module Chess
   describe Board do
+    King = Pieces::King
+    Queen = Pieces::Queen
+    Rook = Pieces::Rook
+    Bishop = Pieces::Bishop
+    Knight = Pieces::Knight
+    Pawn = Pieces::Pawn
+    
     describe '#in_check?' do
       subject(:board) { described_class.new(chess_set: false) }
       before do

@@ -2,7 +2,6 @@
 
 module Chess
   module Utilities
-    module Validatable
       def path_clear?(current_position, destination_position)
         return true if select_square(current_position)&.name == :knight
 
@@ -34,13 +33,9 @@ module Chess
       def clear_destination?(position)
         unpack(position) { |x, y|  @grid[x][y].nil? }
       end
-    end
-
-    module Unpackable
       def unpack(position)
         px, py = position
         yield(px, py) if block_given?
       end
-    end
   end
 end

@@ -1,30 +1,32 @@
 # frozen_string_literal: true
 
 module Chess
-  class Queen < Piece
-    attr_reader :name, :score
+  module Pieces
+    class Queen < Piece
+      attr_reader :name, :score
 
-    def initialize(color, current_position, board)
-      super(color, current_position, board)
-      @name = :queen
-      @score = 9
-    end
+      def initialize(color, current_position, board)
+        super(color, current_position, board)
+        @name = :queen
+        @score = 9
+      end
 
-    def move!
-      super
-      basic_move
-    end
+      def move!
+        super
+        basic_move
+      end
 
-    def possible_moves
-      straight_moves + diagonal_moves
-    end
+      def possible_moves
+        straight_moves + diagonal_moves
+      end
 
-    private
+      private
 
-    include Actionable::Slidable::Straight
-    include Actionable::Slidable::Diagonal
-    def assign_symbol
-      color == :white ? '♕' : '♛'
+      include Actionable::Slidable::Straight
+      include Actionable::Slidable::Diagonal
+      def assign_symbol
+        color == :white ? '♕' : '♛'
+      end
     end
   end
 end

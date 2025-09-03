@@ -36,7 +36,7 @@ module Chess
         best_moves = []
 
         piece.safe_moves do |cboard, position|
-          next if board.in_check?
+          next if cboard.in_check?
 
           if !cboard.square_under_attack?(position) || sacrifice_worth?(piece, position)
             # moves that wont put another pieces in danger

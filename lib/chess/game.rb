@@ -1,24 +1,11 @@
 # frozen_string_literal: true
 
-require_relative 'piece'
-require_relative 'pieces/bishop'
-require_relative 'pieces/king'
-require_relative 'pieces/knight'
-require_relative 'pieces/pawn'
-require_relative 'pieces/queen'
-require_relative 'pieces/rook'
-require_relative 'board'
-require_relative 'displayable'
-require_relative 'algebraic_notation'
-require_relative 'db'
-require 'pry-byebug'
-
 module Chess
   class Game
     using AlgebraicRefinements
     extend Db::Load
     include Db::Save
-    attr_reader :board, :current_player
+    attr_reader :board, :current_player, :player_1, :player_2
 
     def initialize(player1, player2, chess_board = Board.new)
       @board = chess_board
@@ -92,12 +79,7 @@ module Chess
         print prompt.colorize(:green)
         input = gets.chomp.downcase
 
-        if input == 'save'
-          puts "Enter filename (or press Enter for default 'saved_game.dat'):"
-          filename = gets.chomp
-          'chess.dat' if filename.empty?
-          next # Ask for input again after saving
-        elsif input == 'exit'
+        if input == 'exit'
           handle_exit
           exit
         end
@@ -110,9 +92,9 @@ module Chess
       answer = gets.chomp.downcase
 
       if answer == 'y'
-        puts "Enter filename (or press Enter for default 'chess.dat'):"
+        puts "Enter filename (or press Enter for default 'chess_*.dat'):"
         filename = gets.chomp
-        if save_file!(filename)
+        if save_file!(filename, dump)
           puts 'Game saved. Goodbye!'
         else
           puts 'Save failed. Exiting without saving.'
@@ -120,6 +102,14 @@ module Chess
       else
         puts 'Exiting without saving. Goodbye!'
       end
+    end
+    def dump
+      {
+        board: board, 
+        current_player: current_player, 
+        player_1: player_1, 
+        player_2: player_2
+      }
     end
   end
 end

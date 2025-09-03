@@ -1,11 +1,7 @@
 # frozen_string_literal: true
-
-require 'chess/piece'
-require 'chess/board'
-require 'chess/pieces/bishop'
-require 'chess/pieces/king'
-
+require "spec_helper"
 module Chess
+  module Pieces
   describe Bishop do
     subject(:board) { Board.new(chess_set: false) }
     subject(:bishop) { described_class.new(:white, [4, 4], board) }
@@ -76,4 +72,5 @@ module Chess
       end
     end
   end
+end
 end
