@@ -103,11 +103,12 @@ module Chess
         puts 'Exiting without saving. Goodbye!'
       end
     end
+
     def dump
       {
-        board: board, 
-        current_player: current_player, 
-        player_1: player_1, 
+        board: board,
+        current_player: current_player,
+        player_1: player_1,
         player_2: player_2
       }
     end

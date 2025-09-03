@@ -6,5 +6,4 @@ loader.push_dir(__dir__)
 loader.setup
 
 module Chess
-	
 end

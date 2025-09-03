@@ -1,6 +1,5 @@
 module Chess
   module Actionable
-
     module Slidable
       # theese methods are aliesed in the pieces classes so they can be used be the queen too
       module Straight

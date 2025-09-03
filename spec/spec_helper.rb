@@ -17,7 +17,7 @@
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'bundler/setup'
 Bundler.require(:default)
-require "chess"
+require 'chess'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

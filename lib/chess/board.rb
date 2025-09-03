@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Chess
   class Board
     include Gamestate
@@ -127,7 +126,7 @@ module Chess
     end
 
     private
-    
+
     def populate_board
       @grid[0] = [
         Rook.new(:white, [0, 0], self),

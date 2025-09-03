@@ -1,6 +1,6 @@
 module Chess
   module Db
-	  module Save
+    module Save
       def save_file!(filename, data)
         filename = "chess_#{Time.now.strftime('%Y%m%d')}.dat" if filename.empty?
         begin

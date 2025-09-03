@@ -14,4 +14,4 @@ gem 'colorize', '~> 1.1'
 
 gem 'artii', '~> 2.1'
 
-gem "zeitwerk", "~> 2.7"
+gem 'zeitwerk', '~> 2.7'
