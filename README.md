@@ -1,86 +1,153 @@
-![Ruby](https://img.shields.io/badge/ruby-%23CC342D.svg?style=for-the-badge&logo=ruby&logoColor=white)
-
-# Chess
-
-A basic command line ruby chess game where two players can play against each other or against a **simple computer player**.
-
->[!NOTE]
-> This is the final project in the Ruby curriculum at The Odin Project.
+# chess.rb - Chess 
+<a href="https://codesandbox.io/p/github/jaws-1684/chess/main">View on codesandox.</a>
 
 ## Description
+A basic command line chess game written in ruby where two players can play against each other or against a **simple computer player**.
+>[!NOTE]
+> This project was build as the last assignment in the Ruby curriculum at The Odin Project.
 
-+ move generation/validation
-+ piece placement/movement
-+ enpassant and promotion for pawns
-+ castling for king
-+ check/checkmate/stalemate detection
-+ saving the game
+## About The Project
+<p align="center">
+  <img height="350" src="https://raw.githubusercontent.com/jaws-1684/chess/refs/heads/images/demo.gif">
+</p>
+&nbsp&nbspChess is a board game for two players, played on a square board consisting of 64 squares arranged in an 8×8 grid. The players, referred to as "White" and "Black", each control sixteen pieces: one king, one queen, two rooks, two bishops, two knights, and eight pawns, with each piece type having a different pattern of movement (https://en.wikipedia.org/wiki/Chess).<br>&nbsp&nbspThe project implements the following key features:
 
-## Structure
+* **Move generation/validation**
+* **Piece placement/movement**
+* **Enpassant and promotion for pawns**
+* **Castling for king**
+* **Check/Checkmate/Stalemate state detection**
+* **Saving the game state**
 
-```
-├── bin
-│├── chess
-│└── chess_20250901.dat
-├── chess-1.1.0.gem
-├── chess_v1.1.gemspec
-├── Gemfile
-├── Gemfile.lock
-├── lib
-│└── chess
-│    ├── actionable.rb
-│    ├── algebraic_notation.rb
-│    ├── board.rb
-│    ├── computer
-│    │└── computer.rb
-│    ├── db.rb
-│    ├── displayable.rb
-│    ├── game.rb
-│    ├── gamestate
-│    │└── gamestate.rb
-│    ├── piece.rb
-│    ├── pieces
-│    │├── bishop.rb
-│    │├── king.rb
-│    │├── knight.rb
-│    │├── pawn.rb
-│    │├── queen.rb
-│    │└── rook.rb
-│    ├── rememberable.rb
-│    └── utilities.rb
-├── LICENSE
-├── README.md
-└── spec
-    ├── chess
-    │├── bishop_spec.rb
-    │├── gamestate_spec.rb
-    │├── king_spec.rb
-    │├── knight_spec.rb
-    │├── pawn_spec.rb
-    │├── queen_spec.rb
-    │└── rook_spec.rb
-    └── spec_helper.rb
+### Built With
+<img height="25" style="margin-right: 15px" src="https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fimage.pngaaa.com%2F152%2F769152-middle.png&sp=1783005688Taf04941b3e05fbb5d7c481d9caf350faf97813e51ee971ac2aa349315d0a06a4"/>
+<img height="25" style="margin-right: 15px" src="https://support.testmo.com/hc/article_attachments/39192821548557">
+<img height="25" style="margin-right: 15px" src="https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fraw.github.com%2Frubocop%2Frubocop%2Fmaster%2Flogo%2Frubo-logo-horizontal.png&sp=1783005600T1423cad5b6827a2a39a1f8b2412653a57a87101b49b7e664ce3f3e666cd2e6da"/>
 
-```
 
-## Installation
+
+
+---
+
+## Getting Started
+### Prerequisites
+Make sure you have ruby installed.
+
+### Installation from gemfile
 
 Run the following command to install this game as a ruby gem:
 
 ```sh
-	gem install chess-1.1.0.gem
+gem install chess-1.1.0.gem
 ```
-Then run the game from your terminal with `chess`.
 
->[!TIP]
-> If installing the gem is not an option, after cloning the repository, first install the dependecies: `bundle install`.
-And run the game with `bin/chess`.
+###  Installation from source
+
+1. Clone the repository
+   ```sh
+   git clone https://github.com/jaws-1684/chess.git
+   ```
+2. Navigate into the project directory
+   ```sh
+   cd chess
+   ```
+3. Install dependencies
+   ```sh
+   bundle install
+   ```
+
+## Usage
+
+### Run 
+```sh
+bin/chess
+```
+
+### Run tests
+```sh
+bundle exec rspec
+```
+### Run linter
+```sh
+bundle exec rubocop
+```
 
 
-## Author
 
-jaws
+---
+## How to play
+1. Select color
+2. Make a move
+3. Play
+
+
+
+## Project Structure
+
+```
+├── Gemfile
+├── Gemfile.lock
+├── LICENSE
+├── README.md
+├── bin
+│   ├── chess
+│   ├── chess_20250903.dat
+│   └── chess_20260702.dat
+├── chess-1.1.0.gem
+├── chess_v1.1.gemspec
+├── lib
+│   ├── chess
+│   │   ├── actionable
+│   │   ├── algebraic_refinements.rb
+│   │   ├── board.rb
+│   │   ├── computer.rb
+│   │   ├── coordinates.rb
+│   │   ├── db
+│   │   ├── displayable.rb
+│   │   ├── game.rb
+│   │   ├── gamestate.rb
+│   │   ├── piece.rb
+│   │   ├── pieces
+│   │   ├── rememberable.rb
+│   │   └── utilities.rb
+│   └── chess.rb
+└── spec
+    ├── lib
+    │   └── chess
+    └── spec_helper.rb
+```
+
+
+---
+
+## Contributing
+If you have some *amazing* improvement ideas *feel free* to contribute.
+
+1. Clone this repo
+2. Create your Feature Branch (`git checkout -b feature/my_amazing_feature`)
+3. Commit your Changes (`git commit -m 'Add some amazing_feature'`)
+4. Push to the Branch (`git push origin feature/amazing_feature`)
+5. Open a Pull Request
+
+
+---
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+## Contact
+
+GitHub: [jaws-1684](https://github.com/jaws-1684)
+Project Link: [https://github.com/jaws-1684/chess](https://github.com/jaws-1684/chess)
+
+
+---
+
+## Acknowledgments
+The following resources proved to be quite helpful:
+* [The Odin Project](https://www.theodinproject.com)
+* [Chess](https://en.wikipedia.org/wiki/Chess)
+
