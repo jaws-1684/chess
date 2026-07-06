@@ -20,7 +20,7 @@ A basic command line chess game written in ruby where two players can play again
 * **Saving the game state**
 
 ### Built With
-<img height="25" style="margin-right: 15px" src="https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fimage.pngaaa.com%2F152%2F769152-middle.png&sp=1783005688Taf04941b3e05fbb5d7c481d9caf350faf97813e51ee971ac2aa349315d0a06a4"/>
+<img height="25" style="margin-right: 15px" src="https://images.icon-icons.com/3049/PNG/512/ruby_icon_189423.png"/>
 <img height="25" style="margin-right: 15px" src="https://support.testmo.com/hc/article_attachments/39192821548557">
 <img height="25" style="margin-right: 15px" src="https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fraw.github.com%2Frubocop%2Frubocop%2Fmaster%2Flogo%2Frubo-logo-horizontal.png&sp=1783005600T1423cad5b6827a2a39a1f8b2412653a57a87101b49b7e664ce3f3e666cd2e6da"/>
 
