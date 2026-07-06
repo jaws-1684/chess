@@ -22,7 +22,7 @@ A basic command line chess game written in ruby where two players can play again
 ### Built With
 <img height="25" style="margin-right: 15px" src="https://images.icon-icons.com/3049/PNG/512/ruby_icon_189423.png"/>
 <img height="25" style="margin-right: 15px" src="https://support.testmo.com/hc/article_attachments/39192821548557">
-<img height="25" style="margin-right: 15px" src="https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fraw.github.com%2Frubocop%2Frubocop%2Fmaster%2Flogo%2Frubo-logo-horizontal.png&sp=1783005600T1423cad5b6827a2a39a1f8b2412653a57a87101b49b7e664ce3f3e666cd2e6da"/>
+<img height="25" style="margin-right: 15px" src="https://media.proglib.io/posts/2020/12/16/199f892bf6ebd668f777e0b15a043e76.jpg"/>
 
 
 
